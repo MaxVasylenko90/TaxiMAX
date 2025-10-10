@@ -1,19 +1,12 @@
-package dev.mvasylenko.carservice.entity;
+package dev.mvasylenko.core.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
 
-@Entity
-@Table(name = "cars")
-public class Car {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
+public class CarDto {
     @NotBlank(message = "Car number is required!")
     @Size(max = 10, message = "Maximum 10 characters!")
     private String carNumber;
@@ -34,10 +27,10 @@ public class Car {
 
     private UUID driverId;
 
-    public Car() {
+    public CarDto() {
     }
 
-    public Car(String carNumber, String brand, String model, String color, boolean available, UUID driverId) {
+    public CarDto(String carNumber, String brand, String model, String color, boolean available, UUID driverId) {
         this.carNumber = carNumber;
         this.brand = brand;
         this.model = model;
@@ -76,10 +69,6 @@ public class Car {
 
     public void setColor(String color) {
         this.color = color;
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public boolean isAvailable() {

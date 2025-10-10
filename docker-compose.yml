@@ -1,13 +1,11 @@
 services:
   kafka-1:
-    image: 'bitnami/kafka:3.3.2'
+    image: 'bitnami/kafka:latest'
     container_name: kafka-1
     environment:
-      # KRaft settings
       - KAFKA_CFG_NODE_ID=1
       - KAFKA_CFG_PROCESS_ROLES=broker,controller
-      - KAFKA_KRAFT_CLUSTER_ID=r4zt_wrqTRuT7W2NJsB_GA
-      # Listeners
+      - KAFKA_KRAFT_CLUSTER_ID=Y93YUdLWSJO7n7uFjJ1D_w
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9091
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9192,EXTERNAL://localhost:9091
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
@@ -17,17 +15,15 @@ services:
     ports:
       - 9091:9091
     volumes:
-      - ../kafka-volumes/server-1:/bitnami/kafka
+      - kafka1_data:/bitnami/kafka
 
   kafka-2:
-    image: 'bitnami/kafka:3.3.2'
+    image: 'bitnami/kafka:latest'
     container_name: kafka-2
     environment:
-      # KRaft settings
       - KAFKA_CFG_NODE_ID=2
       - KAFKA_CFG_PROCESS_ROLES=broker,controller
-      - KAFKA_KRAFT_CLUSTER_ID=r4zt_wrqTRuT7W2NJsB_GA
-      # Listeners
+      - KAFKA_KRAFT_CLUSTER_ID=Y93YUdLWSJO7n7uFjJ1D_w
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9192,EXTERNAL://localhost:9092
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
@@ -37,17 +33,15 @@ services:
     ports:
       - 9092:9092
     volumes:
-      - ../kafka-volumes/server-2:/bitnami/kafka
+      - kafka2_data:/bitnami/kafka
 
   kafka-3:
-    image: 'bitnami/kafka:3.3.2'
+    image: 'bitnami/kafka:latest'
     container_name: kafka-3
     environment:
-      # KRaft settings
       - KAFKA_CFG_NODE_ID=3
       - KAFKA_CFG_PROCESS_ROLES=broker,controller
-      - KAFKA_KRAFT_CLUSTER_ID=r4zt_wrqTRuT7W2NJsB_GA
-      # Listeners
+      - KAFKA_KRAFT_CLUSTER_ID=Y93YUdLWSJO7n7uFjJ1D_w
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9093
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-3:9192,EXTERNAL://localhost:9093
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
@@ -57,4 +51,23 @@ services:
     ports:
       - 9093:9093
     volumes:
-      - ../kafka-volumes/server-3:/bitnami/kafka
+      - kafka3_data:/bitnami/kafka
+
+  postgres:
+    image: 'postgres:latest'
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: nimda
+      POSTGRES_DB: taxiMaxDb
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  kafka1_data:
+  kafka2_data:
+  kafka3_data:
+  postgres_data:
