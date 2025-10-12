@@ -47,7 +47,7 @@ public class CarServiceImpl implements CarService {
         var reservationResult = carRepository.reserveCarForDriver(car.getId(), driverId);
 
         if (reservationResult == ZERO_UPDATED_CARS) {
-            throw new CarAlreadyReservedException("Car with id=" + carId +" already reserved");
+            throw new CarAlreadyReservedException("Car with id=" + carId +" already reserved!");
         }
 
         CarSuccessfullyReservedEvent event = new CarSuccessfullyReservedEvent(carId, driverId);

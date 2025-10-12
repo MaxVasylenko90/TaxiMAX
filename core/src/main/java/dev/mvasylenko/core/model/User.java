@@ -1,31 +1,79 @@
 package dev.mvasylenko.core.model;
 
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
+import java.util.*;
+
+@MappedSuperclass
 public abstract class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = "name")
+    @NotBlank(message = "Name is required!")
+    @Size(min = 2, max = 50)
     private String name;
+
+    @Column(name = "surname")
+    @NotBlank(message = "Surname is required!")
+    @Size(min = 2, max = 50)
+    private String surname;
+
+    @Column(name = "password")
+    @NotBlank(message = "Password is required!")
+    @Size(min = 2, max = 50)
     private String password;
+
+    @Column(unique = true, nullable = false)
+    @NotBlank(message = "Email is required!")
+    @Email
+    @Size(min = 5, max = 50)
     private String email;
+
+    @Column(name = "amount", precision = 10, scale = 2, nullable = false)
+    @DecimalMin(value = "0.00")
+    private BigDecimal amount = BigDecimal.ZERO;;
+
+    @Column(name = "phone")
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^[0-9]{9}$", message = "Number should contain only 9 digits from 0 to 9")
     private String phone;
-    private AtomicInteger starsRating;
-    private List<String> comments;
-    private LinkedHashSet<UUID> rideHistory;
+
+    @Column(name = "averageRating", precision = 3, scale = 2, nullable = false)
+    @DecimalMin(value = "0.00")
+    @DecimalMax(value = "5.00")
+    @NotNull
+    private BigDecimal averageRating = BigDecimal.ZERO;
+
+    @Column(name = "comment")
+    @ElementCollection
+    @CollectionTable(
+            name = "user_comments",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<String> comments = new ArrayList<>();
+
+    @Column(name = "ride_id")
+    @ElementCollection
+    @CollectionTable(
+            name = "user_ride_history",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<UUID> rideHistory = new LinkedHashSet<>();
 
     public User() {
     }
 
-    public User(String name, String password, String email, String phone) {
+    public User(String name, String surname, String password, String email, String phone, BigDecimal amount) {
         this.name = name;
+        this.surname = surname;
         this.password = password;
         this.email = email;
         this.phone = phone;
-        this.starsRating = new AtomicInteger(0);
-        this.comments = new LinkedList<>();
-        this.rideHistory = new LinkedHashSet<>();
+        this.amount = amount;
     }
 
     public String getName() {
@@ -60,14 +108,6 @@ public abstract class User {
         this.phone = phone;
     }
 
-    public AtomicInteger getStarsRating() {
-        return starsRating;
-    }
-
-    public void setStarsRating(AtomicInteger starsRating) {
-        this.starsRating = starsRating;
-    }
-
     public List<String> getComments() {
         return comments;
     }
@@ -76,11 +116,39 @@ public abstract class User {
         this.comments = comments;
     }
 
-    public LinkedHashSet<UUID> getRideHistory() {
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public BigDecimal getAverageRating() {
+        return averageRating;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public void setAverageRating(BigDecimal averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Set<UUID> getRideHistory() {
         return rideHistory;
     }
 
-    public void setRideHistory(LinkedHashSet<UUID> rideHistory) {
+    public void setRideHistory(Set<UUID> rideHistory) {
         this.rideHistory = rideHistory;
+    }
+
+    public UUID getId() {
+        return id;
     }
 }

@@ -1,5 +1,6 @@
 package dev.mvasylenko.carservice.handler;
 
+import dev.mvasylenko.carservice.exception.CarAlreadyReservedException;
 import dev.mvasylenko.carservice.exception.CarNotFoundException;
 import dev.mvasylenko.carservice.exception.NotAvailableCarsException;
 import dev.mvasylenko.core.dto.ErrorResponseDto;
@@ -21,6 +22,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDto handleCarNotFound(CarNotFoundException ex) {
         return new ErrorResponseDto("CAR_NOT_FOUND_EXCEPTION", ex.getMessage());
+    }
+
+    @ExceptionHandler(CarAlreadyReservedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponseDto handleCarNotFound(CarAlreadyReservedException ex) {
+        return new ErrorResponseDto("CAR_ALREADY_RESERVED_EXCEPTION", ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

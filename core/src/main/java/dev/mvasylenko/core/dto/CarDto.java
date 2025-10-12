@@ -7,6 +7,9 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
 public class CarDto {
+
+    private UUID id;
+
     @NotBlank(message = "Car number is required!")
     @Size(max = 10, message = "Maximum 10 characters!")
     private String carNumber;
@@ -37,6 +40,14 @@ public class CarDto {
         this.color = color;
         this.available = available;
         this.driverId = driverId;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getCarNumber() {

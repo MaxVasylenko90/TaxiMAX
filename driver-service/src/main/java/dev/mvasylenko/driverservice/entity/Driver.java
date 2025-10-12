@@ -2,33 +2,32 @@ package dev.mvasylenko.driverservice.entity;
 
 import dev.mvasylenko.core.model.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 
 @Entity
-@Table(name = "drivers")
+@Table(name = "driver")
 public class Driver extends User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
 
+    @Column(name = "driver_licence_number")
+    @Size(min = 2, max = 20)
     private String driverLicenceNumber;
 
+    @Column(name = "car_id")
     private UUID carId;
 
     public Driver() {
         super();
     }
 
-    public Driver(String name, String password, String email, String phone, String driverLicenceNumber, UUID carId) {
-        super(name, password, email, phone);
+    public Driver(String name, String surname, String password, String email, String phone,
+                  BigDecimal amount, String driverLicenceNumber, UUID carId) {
+        super(name, surname, password, email, phone, amount);
         this.driverLicenceNumber = driverLicenceNumber;
         this.carId = carId;
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public String getDriverLicenceNumber() {

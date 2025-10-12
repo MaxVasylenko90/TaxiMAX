@@ -1,6 +1,5 @@
-package dev.mvasylenko.ratingservice.entity;
+package dev.mvasylenko.core.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -9,33 +8,27 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "rating")
-public class Rating {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+public class RatingDto {
+
     private UUID id;
 
-    @Column(name = "user_id")
     @NotNull
     private UUID userId;
 
-    @Column(name = "stars")
     @Min(1)
     @Max(5)
     private int stars;
 
-    @Column(name = "comment")
     @Size(max = 500)
     private String comment;
 
-    @Column(name = "date")
     private LocalDateTime date;
 
-    public Rating() {
+    public RatingDto() {
     }
 
-    public Rating(UUID userId, int stars, String comment, LocalDateTime date) {
+    public RatingDto(UUID id, UUID userId, int stars, String comment, LocalDateTime date) {
+        this.id = id;
         this.userId = userId;
         this.stars = stars;
         this.comment = comment;
