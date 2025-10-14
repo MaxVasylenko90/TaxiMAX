@@ -12,8 +12,8 @@ import java.util.UUID;
 
 @Repository
 public interface CarRepository extends JpaRepository<Car, UUID> {
-    @Modifying
-    @Transactional
+
+    @Modifying(flushAutomatically = true)
     @Query("UPDATE Car SET available = false, driverId = :driverId WHERE id = :carId AND available = true")
     Integer reserveCarForDriver(UUID carId, UUID driverId);
 

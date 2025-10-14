@@ -1,14 +1,19 @@
 package dev.mvasylenko.carservice.service.impl;
 
 import dev.mvasylenko.carservice.entity.Car;
+import dev.mvasylenko.carservice.entity.CarRentalHistory;
 import dev.mvasylenko.carservice.exception.CarAlreadyReservedException;
 import dev.mvasylenko.carservice.exception.CarNotFoundException;
 import dev.mvasylenko.carservice.exception.NotAvailableCarsException;
 import dev.mvasylenko.carservice.mapper.CarMapper;
 import dev.mvasylenko.carservice.repository.CarRepository;
+import dev.mvasylenko.carservice.service.CarRentalHistoryService;
 import dev.mvasylenko.carservice.service.CarService;
 import dev.mvasylenko.core.dto.CarDto;
-import dev.mvasylenko.core.event.CarSuccessfullyReservedEvent;
+import dev.mvasylenko.core.dto.DriverDto;
+import dev.mvasylenko.core.dto.RentCarRequest;
+import dev.mvasylenko.core.enums.CarRentalStatus;
+import dev.mvasylenko.core.events.CarSuccessfullyReservedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,21 +33,26 @@ public class CarServiceImpl implements CarService {
     private final CarRepository carRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String carEventsTopicName;
+    private final CarRentalHistoryService carRentalHistoryService;
 
     public CarServiceImpl(CarRepository carRepository, KafkaTemplate<String, Object> kafkaTemplate,
-                          @Value("${car.events.topic.name}") String carEventsTopicName) {
+                          @Value("${car.events.topic.name}") String carEventsTopicName,
+                          CarRentalHistoryService carRentalHistoryService) {
         this.carRepository = carRepository;
         this.kafkaTemplate = kafkaTemplate;
         this.carEventsTopicName = carEventsTopicName;
+        this.carRentalHistoryService = carRentalHistoryService;
     }
 
     @Override
-    public void reserveCarForDriver(UUID carId, UUID driverId) throws CarAlreadyReservedException,
+    @Transactional
+    public void reserveCarForDriver(UUID carId, RentCarRequest request) throws CarAlreadyReservedException,
             CarNotFoundException, IllegalArgumentException {
-        validateIds(carId, driverId);
+        validateIds(carId, request);
 
-        Car car = carRepository.findById(carId)
-                .orElseThrow(() -> new CarNotFoundException("Car with id=" + carId +" already reserved"));
+        var driverId = request.getDriverId();
+
+        var car = getCarById(carId);
 
         var reservationResult = carRepository.reserveCarForDriver(car.getId(), driverId);
 
@@ -50,10 +60,12 @@ public class CarServiceImpl implements CarService {
             throw new CarAlreadyReservedException("Car with id=" + carId +" already reserved!");
         }
 
-        CarSuccessfullyReservedEvent event = new CarSuccessfullyReservedEvent(carId, driverId);
+        carRentalHistoryService.add(carId, driverId, CarRentalStatus.RESERVED);
+
+        CarSuccessfullyReservedEvent event = new CarSuccessfullyReservedEvent(carId, driverId, car.getRentPrice());
         kafkaTemplate.send(carEventsTopicName, car.getId().toString(), event);
 
-        LOG.info("Car with id={} was reserved for driver {}", carId, driverId);
+        LOG.info("Car with id={} was reserved for driver {}. Waiting for payment.", carId, driverId);
     }
 
     @Override
@@ -77,9 +89,35 @@ public class CarServiceImpl implements CarService {
         return CarMapper.INSTANCE.carToCarDto(car);
     }
 
-    private void validateIds(UUID carId, UUID driverId) {
-        if (carId == null || driverId == null) {
-            throw new IllegalArgumentException("CarId and driverId cannot be null");
+    @Override
+    public CarDto getCar(UUID carId) {
+        return CarMapper.INSTANCE.carToCarDto(getCarById(carId));
+    }
+
+    @Override
+    public void changeCarRentalStatus(UUID carId, CarRentalStatus status) {
+        carRentalHistoryService.add(carId, getCarById(carId).getDriverId(), status);
+    }
+
+    @Override
+    @Transactional
+    public void releaseCar(UUID carId) {
+        var car = getCarById(carId);
+        car.setAvailable(Boolean.TRUE);
+        car.setDriverId(null);
+        carRepository.save(car);
+
+        LOG.info("Car with id={} has been released and is again available for rental.", carId);
+    }
+
+    private void validateIds(UUID carId, RentCarRequest request) {
+        if (carId == null || request == null) {
+            throw new IllegalArgumentException("CarId and driver cannot be null");
         }
+    }
+
+    private Car getCarById(UUID carId) {
+        return carRepository.findById(carId)
+                .orElseThrow(() -> new CarNotFoundException("Car with id=" + carId +" wasn't found!"));
     }
 }

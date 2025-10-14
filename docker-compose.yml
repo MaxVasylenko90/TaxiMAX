@@ -53,21 +53,49 @@ services:
     volumes:
       - kafka3_data:/bitnami/kafka
 
-  postgres:
+  postgres-car:
     image: 'postgres:latest'
-    container_name: postgres
+    container_name: postgres_car
     restart: always
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: nimda
-      POSTGRES_DB: taxiMaxDb
+      POSTGRES_DB: carServiceDb
     ports:
       - "5433:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - car_data:/var/lib/postgresql/data
+
+  postgres-driver:
+    image: 'postgres:latest'
+    container_name: postgres_driver
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: nimda
+      POSTGRES_DB: driverServiceDb
+    ports:
+      - "5434:5432"
+    volumes:
+      - driver_data:/var/lib/postgresql/data
+
+  postgres-payment:
+    image: 'postgres:latest'
+    container_name: postgres_payment
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: nimda
+      POSTGRES_DB: paymentServiceDb
+    ports:
+      - "5435:5432"
+    volumes:
+      - payment_data:/var/lib/postgresql/data
 
 volumes:
   kafka1_data:
   kafka2_data:
   kafka3_data:
-  postgres_data:
+  car_data:
+  driver_data:
+  payment_data:

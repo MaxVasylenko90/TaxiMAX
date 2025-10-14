@@ -13,8 +13,8 @@
     </parent>
 
 
-    <name>auth-service</name>
-    <description>auth-service</description>
+    <name>car-service</name>
+    <description>car-service</description>
     <url/>
     <licenses>
         <license/>

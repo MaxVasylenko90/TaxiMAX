@@ -42,7 +42,7 @@ public abstract class User {
     @Pattern(regexp = "^[0-9]{9}$", message = "Number should contain only 9 digits from 0 to 9")
     private String phone;
 
-    @Column(name = "averageRating", precision = 3, scale = 2, nullable = false)
+    @Column(name = "average_rating", precision = 3, scale = 2, nullable = false)
     @DecimalMin(value = "0.00")
     @DecimalMax(value = "5.00")
     @NotNull

@@ -1,9 +1,11 @@
 package dev.mvasylenko.core.dto;
 
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class CarDto {
@@ -30,16 +32,28 @@ public class CarDto {
 
     private UUID driverId;
 
+    @DecimalMin(value = "0.00")
+    private BigDecimal rentPrice;
+
     public CarDto() {
     }
 
-    public CarDto(String carNumber, String brand, String model, String color, boolean available, UUID driverId) {
+    public CarDto(String carNumber, String brand, String model, String color, UUID driverId) {
         this.carNumber = carNumber;
         this.brand = brand;
         this.model = model;
         this.color = color;
-        this.available = available;
+        this.available = Boolean.FALSE;
         this.driverId = driverId;
+    }
+
+    public CarDto(String carNumber, String brand, String model, String color, BigDecimal rentPrice) {
+        this.carNumber = carNumber;
+        this.brand = brand;
+        this.model = model;
+        this.color = color;
+        this.available = Boolean.TRUE;
+        this.rentPrice = rentPrice;
     }
 
     public UUID getId() {
@@ -96,5 +110,13 @@ public class CarDto {
 
     public void setDriverId(UUID driverId) {
         this.driverId = driverId;
+    }
+
+    public BigDecimal getRentPrice() {
+        return rentPrice;
+    }
+
+    public void setRentPrice(BigDecimal rentPrice) {
+        this.rentPrice = rentPrice;
     }
 }

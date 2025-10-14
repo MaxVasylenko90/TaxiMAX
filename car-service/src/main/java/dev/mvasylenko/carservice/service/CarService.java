@@ -4,6 +4,8 @@ import dev.mvasylenko.carservice.exception.CarAlreadyReservedException;
 import dev.mvasylenko.carservice.exception.CarNotFoundException;
 import dev.mvasylenko.carservice.exception.NotAvailableCarsException;
 import dev.mvasylenko.core.dto.CarDto;
+import dev.mvasylenko.core.dto.RentCarRequest;
+import dev.mvasylenko.core.enums.CarRentalStatus;
 
 import java.util.Set;
 import java.util.UUID;
@@ -14,12 +16,12 @@ public interface CarService {
      * or CarNotFoundException in case the car wasn't found
      * or IllegalArgumentException if carId or driverId is null
      * @param carId
-     * @param driverId
+     * @param rentCarRequest
      * @throws CarAlreadyReservedException
      * @throws CarNotFoundException
      * @throws IllegalArgumentException
      */
-    void reserveCarForDriver(UUID carId, UUID driverId) throws CarAlreadyReservedException,
+    void reserveCarForDriver(UUID carId, RentCarRequest rentCarRequest) throws CarAlreadyReservedException,
             CarNotFoundException, IllegalArgumentException;
 
     /**
@@ -35,4 +37,23 @@ public interface CarService {
      * @return - registered carDto
      */
     CarDto registerNewCar(CarDto carDto);
+
+    /**
+     * Get car by car id
+     * @param carId
+     * @return CarDto object
+     */
+    CarDto getCar(UUID carId);
+
+    /**
+     * Change car rental status
+     * @param status
+     */
+    void changeCarRentalStatus(UUID carId, CarRentalStatus status);
+
+    /**
+     * Release car
+     * @param carId
+     */
+    void releaseCar(UUID carId);
 }

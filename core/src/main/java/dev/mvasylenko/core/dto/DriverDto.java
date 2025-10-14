@@ -1,5 +1,6 @@
 package dev.mvasylenko.core.dto;
 
+import dev.mvasylenko.core.enums.DriverStatus;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -45,9 +46,12 @@ public class DriverDto {
     private Set<UUID> rideHistory;
 
     @Size(min = 2, max = 20)
+    @NotBlank
     private String driverLicenceNumber;
 
     private UUID carId;
+
+    private DriverStatus status;
 
     public DriverDto() {
         super();
@@ -55,7 +59,7 @@ public class DriverDto {
 
     public DriverDto(UUID id, String name, String surname, String password, String email, BigDecimal amount,
                      String phone, BigDecimal averageRating, List<String> comments, Set<UUID> rideHistory,
-                     String driverLicenceNumber, UUID carId) {
+                     String driverLicenceNumber, UUID carId, DriverStatus status) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -68,6 +72,7 @@ public class DriverDto {
         this.rideHistory = rideHistory;
         this.driverLicenceNumber = driverLicenceNumber;
         this.carId = carId;
+        this.status = status;
     }
 
     public String getDriverLicenceNumber() {
@@ -164,5 +169,13 @@ public class DriverDto {
 
     public void setRideHistory(Set<UUID> rideHistory) {
         this.rideHistory = rideHistory;
+    }
+
+    public DriverStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(DriverStatus status) {
+        this.status = status;
     }
 }

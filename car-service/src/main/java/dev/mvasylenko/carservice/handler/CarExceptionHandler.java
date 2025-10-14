@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class CarExceptionHandler {
 
     @ExceptionHandler(NotAvailableCarsException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -20,19 +20,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CarNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponseDto handleCarNotFound(CarNotFoundException ex) {
+    public ErrorResponseDto handleCarNotFoundException(CarNotFoundException ex) {
         return new ErrorResponseDto("CAR_NOT_FOUND_EXCEPTION", ex.getMessage());
     }
 
     @ExceptionHandler(CarAlreadyReservedException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponseDto handleCarNotFound(CarAlreadyReservedException ex) {
+    public ErrorResponseDto handleCarAlreadyReservedException(CarAlreadyReservedException ex) {
         return new ErrorResponseDto("CAR_ALREADY_RESERVED_EXCEPTION", ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseDto handleCarNotFound(IllegalArgumentException ex) {
+    public ErrorResponseDto handleCarAlreadyReservedException(IllegalArgumentException ex) {
         return new ErrorResponseDto("ILLEGAL_ARGUMENT_EXCEPTION", ex.getMessage());
     }
 }
