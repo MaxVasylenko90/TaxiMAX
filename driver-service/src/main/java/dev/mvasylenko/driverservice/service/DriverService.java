@@ -2,9 +2,11 @@ package dev.mvasylenko.driverservice.service;
 
 import dev.mvasylenko.core.commands.WithdrawDriverAmountCommand;
 import dev.mvasylenko.core.dto.CarDto;
+import dev.mvasylenko.core.dto.DriverDto;
 import dev.mvasylenko.core.dto.RentCarRequest;
+import org.springframework.http.ResponseEntity;
 
-import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -36,4 +38,24 @@ public interface DriverService {
      * @param kafkaMessageKey
      */
     void withdraw(WithdrawDriverAmountCommand command, String kafkaMessageKey);
+
+    /**
+     * Get list of all drivers
+     * @return  List<DriverDto>
+     */
+    List<DriverDto> getAllDrivers();
+
+    /**
+     * Assign car for driver
+     * @param carId
+     * @param driverId
+     */
+    void assignCarForDriver(UUID carId, UUID driverId);
+
+    /**
+     * Find driver by id
+     * @param driverId
+     * @return DriverDto object
+     */
+    DriverDto findDriver(UUID driverId);
 }

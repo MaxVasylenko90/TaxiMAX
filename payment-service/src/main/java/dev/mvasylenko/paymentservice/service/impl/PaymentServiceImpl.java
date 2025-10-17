@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static dev.mvasylenko.core.constants.CoreConstants.TAXI_MAX_ID;
@@ -41,10 +42,19 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public void changePaymentStatus(UUID paymentId, PaymentStatus status) {
         var payment = getPaymentById(paymentId);
         payment.setStatus(status);
         paymentRepository.save(payment);
+    }
+
+    @Override
+    public List<PaymentDto> findAllPayments() {
+        var payments = paymentRepository.findAll();
+        return payments.stream()
+                .map(PaymentMapper.INSTANCE::paymentToPaymentDto)
+                .toList();
     }
 
     private Payment getPaymentById(UUID paymentId) {

@@ -24,7 +24,7 @@ CREATE
 EXTENSION IF NOT EXISTS "pgcrypto";
 
 INSERT INTO cars (id, car_number, brand, model, color, available, rent_price, driver_id)
-VALUES ('a45e7d8f-624f-4521-9f8f-868bd5b4f37a', 'FY1234ZX', 'BMW', 'X6', 'BLACK', false, 2000.00,
+VALUES ('a45e7d8f-624f-4521-9f8f-868bd5b4f000', 'FY1234ZX', 'BMW', 'X6', 'BLACK', false, 2000.00,
         'a45e7d8f-624f-4521-9f8f-868bd5b4f300'),
-       (gen_random_uuid(), 'AS3544RF', 'Honda', 'Accord', 'RED', true, 3000.00, null),
-       (gen_random_uuid(), 'FX9876AA', 'Hyundai', 'Tucson', 'WHITE', true, 4000.00, null);
+       ('a45e7d8f-624f-4521-9f8f-868bd5b4f001', 'AS3544RF', 'Honda', 'Accord', 'RED', true, 3000.00, null),
+       ('a45e7d8f-624f-4521-9f8f-868bd5b4f002', 'FX9876AA', 'Hyundai', 'Tucson', 'WHITE', true, 4000.00, null);

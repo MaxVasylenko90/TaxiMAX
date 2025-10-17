@@ -17,15 +17,21 @@ public class KafkaConfig {
     private final String paymentCommandsTopicName;
     private final String driverCommandsTopicName;
     private final String carCommandsTopicName;
+    private final String driverEventsTopicName;
+    private final String paymentEventsTopicName;
 
-    public KafkaConfig( @Value("${car.events.topic.name}") String carEventsTopicName,
-                        @Value("${payment.commands.topic.name}") String paymentCommandsTopicName,
-                        @Value("${driver.commands.topic.name}") String driverCommandsTopicName,
-                        @Value("${car.commands.topic.name}") String carCommandsTopicName) {
+    public KafkaConfig(@Value("${car.events.topic.name}") String carEventsTopicName,
+                       @Value("${payment.commands.topic.name}") String paymentCommandsTopicName,
+                       @Value("${driver.commands.topic.name}") String driverCommandsTopicName,
+                       @Value("${car.commands.topic.name}") String carCommandsTopicName,
+                       @Value("${driver.events.topic.name}")String driverEventsTopicName,
+                       @Value("${payment.events.topic.name}")String paymentEventsTopicName) {
         this.carEventsTopicName = carEventsTopicName;
         this.paymentCommandsTopicName = paymentCommandsTopicName;
         this.driverCommandsTopicName = driverCommandsTopicName;
         this.carCommandsTopicName = carCommandsTopicName;
+        this.driverEventsTopicName = driverEventsTopicName;
+        this.paymentEventsTopicName = paymentEventsTopicName;
     }
 
     @Bean
@@ -60,6 +66,22 @@ public class KafkaConfig {
     @Bean
     NewTopic createCarCommandsTopic() {
         return TopicBuilder.name(carCommandsTopicName)
+                .partitions(TOPIC_PARTITIONS)
+                .replicas(TOPIC_REPLICATION_FACTOR)
+                .build();
+    }
+
+    @Bean
+    NewTopic createDriverEventsTopic() {
+        return TopicBuilder.name(driverEventsTopicName)
+                .partitions(TOPIC_PARTITIONS)
+                .replicas(TOPIC_REPLICATION_FACTOR)
+                .build();
+    }
+
+    @Bean
+    NewTopic createPaymentEventsTopic() {
+        return TopicBuilder.name(paymentEventsTopicName)
                 .partitions(TOPIC_PARTITIONS)
                 .replicas(TOPIC_REPLICATION_FACTOR)
                 .build();

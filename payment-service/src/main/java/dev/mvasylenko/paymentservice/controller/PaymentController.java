@@ -28,8 +28,13 @@ public class PaymentController {
         return paymentService.getPayment(paymentId);
     }
 
-    @GetMapping("/{paymentId}")
+    @GetMapping("/{paymentId}/history")
     public List<PaymentHistoryDto> getPaymentHistory(@PathVariable UUID paymentId) {
         return paymentHistoryService.getPaymentHistory(paymentId);
+    }
+
+    @GetMapping()
+    public List<PaymentDto> getAllPayments() {
+        return paymentService.findAllPayments();
     }
 }

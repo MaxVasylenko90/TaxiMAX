@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public class CarSuccessfullyReservedEvent {
+    private UUID eventId = UUID.randomUUID();
     private UUID carId;
     private UUID driverId;
     private BigDecimal carRentPrice;
@@ -39,5 +40,13 @@ public class CarSuccessfullyReservedEvent {
 
     public void setCarRentPrice(BigDecimal carRentPrice) {
         this.carRentPrice = carRentPrice;
+    }
+
+    public UUID getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(UUID eventId) {
+        this.eventId = eventId;
     }
 }

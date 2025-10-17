@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public class CreatePaymentCommand {
+    private UUID commandId = UUID.randomUUID();
     private UUID driverId;
     private BigDecimal carRentPrice;
 
@@ -29,5 +30,13 @@ public class CreatePaymentCommand {
 
     public void setCarRentPrice(BigDecimal carRentPrice) {
         this.carRentPrice = carRentPrice;
+    }
+
+    public UUID getCommandId() {
+        return commandId;
+    }
+
+    public void setCommandId(UUID commandId) {
+        this.commandId = commandId;
     }
 }

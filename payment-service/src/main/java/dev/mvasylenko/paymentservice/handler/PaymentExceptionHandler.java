@@ -9,9 +9,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class PaymentExceptionHandler {
+
     @ExceptionHandler(PaymentNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDto handlePaymentNotFoundException(PaymentNotFoundException ex) {
         return new ErrorResponseDto("PAYMENT_NOT_FOUND_EXCEPTION", ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponseDto handleCarAlreadyReservedException(Exception ex) {
+        return new ErrorResponseDto("EXCEPTION", ex.getMessage());
     }
 }

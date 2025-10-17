@@ -1,6 +1,7 @@
 package dev.mvasylenko.driverservice.controller;
 
 import dev.mvasylenko.core.dto.CarDto;
+import dev.mvasylenko.core.dto.DriverDto;
 import dev.mvasylenko.core.dto.RentCarRequest;
 import dev.mvasylenko.driverservice.service.DriverService;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,11 @@ public class DriverController {
         this.driverService = driverService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<DriverDto>> getAllDrivers() {
+        return ResponseEntity.ok(driverService.getAllDrivers());
+    }
+
     @GetMapping("/available-cars")
     public ResponseEntity<Set<CarDto>> getAvailableCars() {
         return ResponseEntity.ok(driverService.getAvailableToRentCars());
@@ -27,7 +33,8 @@ public class DriverController {
 
     @PostMapping("/{driverId}/rentCar")
     public ResponseEntity<Map<String, String>> rentCar(@RequestBody RentCarRequest rentCarRequest) {
-        return ResponseEntity.accepted().body(driverService.rentCarForDriver(rentCarRequest));
+        var result = driverService.rentCarForDriver(rentCarRequest);
+        return ResponseEntity.accepted().body(result);
     }
 
 
@@ -35,5 +42,10 @@ public class DriverController {
     public ResponseEntity<Map<String, String>> startShift(@PathVariable UUID driverId) {
         driverService.startShift(driverId);
         return ResponseEntity.accepted().body(Collections.singletonMap(MESSAGE, "The driver is ready to work!"));
+    }
+
+    @GetMapping("/{driverId}")
+    public ResponseEntity<DriverDto> getDriver(@PathVariable UUID driverId) {
+        return ResponseEntity.ok().body(driverService.findDriver(driverId));
     }
 }

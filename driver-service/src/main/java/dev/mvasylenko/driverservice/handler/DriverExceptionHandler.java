@@ -1,6 +1,7 @@
 package dev.mvasylenko.driverservice.handler;
 
 import dev.mvasylenko.core.dto.ErrorResponseDto;
+import dev.mvasylenko.driverservice.exception.DriverAlreadyHasCarException;
 import dev.mvasylenko.driverservice.exception.DriverHasNoCarException;
 import dev.mvasylenko.driverservice.exception.DriverNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -14,18 +15,30 @@ public class DriverExceptionHandler {
     @ExceptionHandler(DriverNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDto handleDriverNotFoundException(DriverNotFoundException ex) {
-        return new ErrorResponseDto("DRIVER_NOT_FOUND_EXCEPTION", ex.getMessage());
+        return new ErrorResponseDto("DriverNotFoundException", ex.getMessage());
     }
 
     @ExceptionHandler(DriverHasNoCarException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDto handleDriverHasNoCarException(DriverHasNoCarException ex) {
-        return new ErrorResponseDto("DRIVER_HAS_NO_CAR_EXCEPTION", ex.getMessage());
+        return new ErrorResponseDto("DriverHasNoCarException", ex.getMessage());
     }
 
     @ExceptionHandler(ArithmeticException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDto handleArithmeticException(ArithmeticException ex) {
-        return new ErrorResponseDto("ARITHMETIC_EXCEPTION", ex.getMessage());
+        return new ErrorResponseDto("ArithmeticException", ex.getMessage());
+    }
+
+    @ExceptionHandler(DriverAlreadyHasCarException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponseDto handleDriverAlreadyHasCarException(Exception ex) {
+        return new ErrorResponseDto("DriverAlreadyHasCarException", ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponseDto handleCarAlreadyReservedException(Exception ex) {
+        return new ErrorResponseDto("Exception", ex.getMessage());
     }
 }

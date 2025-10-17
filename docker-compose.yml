@@ -1,53 +1,71 @@
+networks:
+  kafka-net:
+    driver: bridge
+
+name: taximax
+
 services:
   kafka-1:
-    image: 'bitnami/kafka:latest'
+    image: apache/kafka:3.8.0
     container_name: kafka-1
+    restart: always
+    networks:
+      - kafka-net
     environment:
-      - KAFKA_CFG_NODE_ID=1
-      - KAFKA_CFG_PROCESS_ROLES=broker,controller
-      - KAFKA_KRAFT_CLUSTER_ID=Y93YUdLWSJO7n7uFjJ1D_w
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9091
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9192,EXTERNAL://localhost:9091
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_KRAFT_CLUSTER_ID=p7c5BEdZSdWu7EhMFbkYFA
+      - KAFKA_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9091
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9192,EXTERNAL://localhost:9091
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+      - KAFKA_DELETE_TOPIC_ENABLE=true
     ports:
       - 9091:9091
     volumes:
       - kafka1_data:/bitnami/kafka
 
   kafka-2:
-    image: 'bitnami/kafka:latest'
+    image: apache/kafka:3.8.0
     container_name: kafka-2
+    restart: always
+    networks:
+      - kafka-net
     environment:
-      - KAFKA_CFG_NODE_ID=2
-      - KAFKA_CFG_PROCESS_ROLES=broker,controller
-      - KAFKA_KRAFT_CLUSTER_ID=Y93YUdLWSJO7n7uFjJ1D_w
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9192,EXTERNAL://localhost:9092
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+      - KAFKA_NODE_ID=2
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_KRAFT_CLUSTER_ID=p7c5BEdZSdWu7EhMFbkYFA
+      - KAFKA_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9192,EXTERNAL://localhost:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+      - KAFKA_DELETE_TOPIC_ENABLE=true
     ports:
       - 9092:9092
     volumes:
       - kafka2_data:/bitnami/kafka
 
   kafka-3:
-    image: 'bitnami/kafka:latest'
+    image: apache/kafka:3.8.0
     container_name: kafka-3
+    restart: always
+    networks:
+      - kafka-net
     environment:
-      - KAFKA_CFG_NODE_ID=3
-      - KAFKA_CFG_PROCESS_ROLES=broker,controller
-      - KAFKA_KRAFT_CLUSTER_ID=Y93YUdLWSJO7n7uFjJ1D_w
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-3:9192,EXTERNAL://localhost:9093
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+      - KAFKA_NODE_ID=3
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_KRAFT_CLUSTER_ID=p7c5BEdZSdWu7EhMFbkYFA
+      - KAFKA_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094,EXTERNAL://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-3:9192,EXTERNAL://localhost:9093
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+      - KAFKA_DELETE_TOPIC_ENABLE=true
     ports:
       - 9093:9093
     volumes:
@@ -57,6 +75,8 @@ services:
     image: 'postgres:latest'
     container_name: postgres_car
     restart: always
+    networks:
+      - kafka-net
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: nimda
@@ -64,12 +84,14 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - car_data:/var/lib/postgresql/data
+      - postgres_car_data:/var/lib/postgresql/data
 
   postgres-driver:
     image: 'postgres:latest'
     container_name: postgres_driver
     restart: always
+    networks:
+      - kafka-net
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: nimda
@@ -77,12 +99,14 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - driver_data:/var/lib/postgresql/data
+      - postgres_driver_data:/var/lib/postgresql/data
 
   postgres-payment:
     image: 'postgres:latest'
     container_name: postgres_payment
     restart: always
+    networks:
+      - kafka-net
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: nimda
@@ -90,12 +114,48 @@ services:
     ports:
       - "5435:5432"
     volumes:
-      - payment_data:/var/lib/postgresql/data
+      - postgres_payment_data:/var/lib/postgresql/data
+
+  redis-car:
+    image: redis:latest
+    container_name: redis_car
+    networks:
+      - kafka-net
+    ports:
+      - "6379:6379"
+    restart: always
+    volumes:
+      - redis_car_data:/data
+
+  redis-driver:
+    image: redis:latest
+    container_name: redis_driver
+    networks:
+      - kafka-net
+    ports:
+      - "6380:6379"
+    restart: always
+    volumes:
+      - redis_driver_data:/data
+
+  redis-payment:
+    image: redis:latest
+    container_name: redis_payment
+    networks:
+      - kafka-net
+    ports:
+      - "6381:6379"
+    restart: always
+    volumes:
+      - redis_payment_data:/data
 
 volumes:
   kafka1_data:
   kafka2_data:
   kafka3_data:
-  car_data:
-  driver_data:
-  payment_data:
+  postgres_car_data:
+  postgres_driver_data:
+  postgres_payment_data:
+  redis_car_data:
+  redis_driver_data:
+  redis_payment_data:

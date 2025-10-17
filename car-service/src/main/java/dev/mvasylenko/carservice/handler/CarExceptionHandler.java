@@ -35,4 +35,10 @@ public class CarExceptionHandler {
     public ErrorResponseDto handleCarAlreadyReservedException(IllegalArgumentException ex) {
         return new ErrorResponseDto("ILLEGAL_ARGUMENT_EXCEPTION", ex.getMessage());
     }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponseDto handleCarAlreadyReservedException(Exception ex) {
+        return new ErrorResponseDto("EXCEPTION", ex.getMessage());
+    }
 }

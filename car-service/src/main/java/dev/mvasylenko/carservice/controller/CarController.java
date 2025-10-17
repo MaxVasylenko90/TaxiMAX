@@ -33,7 +33,7 @@ public class CarController {
         return carService.getAvailableCarsForRent();
     }
 
-    @PatchMapping("/{carId}/rent")
+    @PostMapping("/{carId}/rent")
     public ResponseEntity<Map<String, String>> rentCar(@PathVariable UUID carId,
                                                        @RequestBody @Valid RentCarRequest request) {
         carService.reserveCarForDriver(carId, request);
@@ -48,12 +48,12 @@ public class CarController {
     }
 
     @GetMapping("/{carId}/history")
-    public List<CarRentalHistoryDto> getCarRentalHistory(UUID carId) {
+    public List<CarRentalHistoryDto> getCarRentalHistory(@PathVariable UUID carId) {
         return carRentalHistoryService.getCarRentalHistory(carId);
     }
 
     @GetMapping("/{carId}")
-    public CarDto getCar(UUID carId) {
+    public CarDto getCar(@PathVariable UUID carId) {
         return carService.getCar(carId);
     }
 }

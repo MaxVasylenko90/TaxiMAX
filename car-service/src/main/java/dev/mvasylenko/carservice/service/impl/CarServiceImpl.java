@@ -1,7 +1,6 @@
 package dev.mvasylenko.carservice.service.impl;
 
 import dev.mvasylenko.carservice.entity.Car;
-import dev.mvasylenko.carservice.entity.CarRentalHistory;
 import dev.mvasylenko.carservice.exception.CarAlreadyReservedException;
 import dev.mvasylenko.carservice.exception.CarNotFoundException;
 import dev.mvasylenko.carservice.exception.NotAvailableCarsException;
@@ -9,11 +8,11 @@ import dev.mvasylenko.carservice.mapper.CarMapper;
 import dev.mvasylenko.carservice.repository.CarRepository;
 import dev.mvasylenko.carservice.service.CarRentalHistoryService;
 import dev.mvasylenko.carservice.service.CarService;
+import dev.mvasylenko.core.commands.AssignCarToDriverCommand;
 import dev.mvasylenko.core.dto.CarDto;
-import dev.mvasylenko.core.dto.DriverDto;
 import dev.mvasylenko.core.dto.RentCarRequest;
 import dev.mvasylenko.core.enums.CarRentalStatus;
-import dev.mvasylenko.core.events.CarSuccessfullyReservedEvent;
+import dev.mvasylenko.core.events.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,14 +32,17 @@ public class CarServiceImpl implements CarService {
     private final CarRepository carRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String carEventsTopicName;
+    private final String driverCommandsTopic;
     private final CarRentalHistoryService carRentalHistoryService;
 
     public CarServiceImpl(CarRepository carRepository, KafkaTemplate<String, Object> kafkaTemplate,
                           @Value("${car.events.topic.name}") String carEventsTopicName,
+                          @Value("${driver.commands.topic.name}") String driverCommandsTopic,
                           CarRentalHistoryService carRentalHistoryService) {
         this.carRepository = carRepository;
         this.kafkaTemplate = kafkaTemplate;
         this.carEventsTopicName = carEventsTopicName;
+        this.driverCommandsTopic = driverCommandsTopic;
         this.carRentalHistoryService = carRentalHistoryService;
     }
 
@@ -57,7 +59,7 @@ public class CarServiceImpl implements CarService {
         var reservationResult = carRepository.reserveCarForDriver(car.getId(), driverId);
 
         if (reservationResult == ZERO_UPDATED_CARS) {
-            throw new CarAlreadyReservedException("Car with id=" + carId +" already reserved!");
+            throw new CarAlreadyReservedException("Car with id=" + carId + " already reserved!");
         }
 
         carRentalHistoryService.add(carId, driverId, CarRentalStatus.RESERVED);
@@ -95,8 +97,19 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public void changeCarRentalStatus(UUID carId, CarRentalStatus status) {
-        carRentalHistoryService.add(carId, getCarById(carId).getDriverId(), status);
+    public void changeCarRentalStatus(UUID carId, CarRentalStatus status, String kafkaMessageKey) {
+        var driverId = getCarById(carId).getDriverId();
+        carRentalHistoryService.add(carId, driverId, status);
+
+        if (status.equals(CarRentalStatus.APPROVED)) {
+            AssignCarToDriverCommand command = new AssignCarToDriverCommand(carId, driverId);
+            kafkaTemplate.send(driverCommandsTopic, kafkaMessageKey, command);
+        }
+    }
+
+    @Override
+    public void changeCarRentalStatus(UUID carId, CarRentalStatus status, String kafkaMessageKey, UUID senderId) {
+        carRentalHistoryService.add(carId, senderId, status);
     }
 
     @Override
@@ -118,6 +131,6 @@ public class CarServiceImpl implements CarService {
 
     private Car getCarById(UUID carId) {
         return carRepository.findById(carId)
-                .orElseThrow(() -> new CarNotFoundException("Car with id=" + carId +" wasn't found!"));
+                .orElseThrow(() -> new CarNotFoundException("Car with id=" + carId + " wasn't found!"));
     }
 }

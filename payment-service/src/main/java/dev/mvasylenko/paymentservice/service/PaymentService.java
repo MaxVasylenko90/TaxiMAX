@@ -4,6 +4,7 @@ import dev.mvasylenko.core.dto.PaymentDto;
 import dev.mvasylenko.core.enums.PaymentStatus;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 public interface PaymentService {
@@ -28,4 +29,10 @@ public interface PaymentService {
      * @param status
      */
     void changePaymentStatus(UUID paymentId, PaymentStatus status);
+
+    /**
+     * Fina all payments
+     * @return list of PaymentDto
+     */
+    List<PaymentDto> findAllPayments();
 }
