@@ -15,11 +15,11 @@ public class PassengerDto {
     @Size(min = 2, max = 50)
     private String name;
 
-    @NotBlank(message = "Surname is required!")
+    @NotNull(message = "Surname is required!")
     @Size(min = 2, max = 50)
     private String surname;
 
-    @NotBlank(message = "Password is required!")
+    @NotNull(message = "Password is required!")
     @Size(min = 2, max = 50)
     private String password;
 
@@ -31,7 +31,7 @@ public class PassengerDto {
     @DecimalMin("0.00")
     private BigDecimal amount;
 
-    @NotBlank(message = "Phone number is required")
+    @NotNull(message = "Phone number is required")
     @Pattern(regexp = "^[0-9]{9}$", message = "Number should contain only 9 digits from 0 to 9")
     private String phone;
 

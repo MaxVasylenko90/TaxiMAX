@@ -1,5 +1,6 @@
 package dev.mvasylenko.core.model;
 
+import dev.mvasylenko.core.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -18,7 +19,7 @@ public abstract class User {
     private String name;
 
     @Column(name = "surname")
-    @NotBlank(message = "Surname is required!")
+    @NotNull(message = "Surname is required!")
     @Size(min = 2, max = 50)
     private String surname;
 
@@ -64,6 +65,11 @@ public abstract class User {
     )
     private Set<UUID> rideHistory = new LinkedHashSet<>();
 
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private Role role;
+
     public User() {
     }
 
@@ -74,6 +80,15 @@ public abstract class User {
         this.email = email;
         this.phone = phone;
         this.amount = amount;
+    }
+
+    public User (String email, String name, Role role) {
+        this.email = email;
+        this.name = name;
+        this.role = role;
+        this.surname = "";
+        this.password = "";
+        this.phone = "";
     }
 
     public String getName() {
@@ -150,5 +165,13 @@ public abstract class User {
 
     public UUID getId() {
         return id;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

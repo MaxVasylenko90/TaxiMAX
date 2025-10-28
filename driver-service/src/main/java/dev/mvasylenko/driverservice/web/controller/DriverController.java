@@ -1,4 +1,4 @@
-package dev.mvasylenko.driverservice.controller;
+package dev.mvasylenko.driverservice.web.controller;
 
 import dev.mvasylenko.core.dto.CarDto;
 import dev.mvasylenko.core.dto.DriverDto;
@@ -33,10 +33,8 @@ public class DriverController {
 
     @PostMapping("/{driverId}/rentCar")
     public ResponseEntity<Map<String, String>> rentCar(@RequestBody RentCarRequest rentCarRequest) {
-        var result = driverService.rentCarForDriver(rentCarRequest);
-        return ResponseEntity.accepted().body(result);
+        return ResponseEntity.accepted().body(driverService.rentCarForDriver(rentCarRequest));
     }
-
 
     @PatchMapping("/{driverId}/startShift")
     public ResponseEntity<Map<String, String>> startShift(@PathVariable UUID driverId) {
