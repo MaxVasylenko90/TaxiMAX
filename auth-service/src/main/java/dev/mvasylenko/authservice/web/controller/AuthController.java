@@ -1,10 +1,10 @@
 package dev.mvasylenko.authservice.web.controller;
 
+import dev.mvasylenko.authservice.entity.AuthUser;
+import dev.mvasylenko.authservice.mapper.AuthUserMapper;
 import dev.mvasylenko.authservice.security.jwt.JwtService;
 import dev.mvasylenko.authservice.service.AuthenticationService;
-import dev.mvasylenko.core.dto.DriverDto;
-import dev.mvasylenko.core.dto.PassengerDto;
-import dev.mvasylenko.core.dto.UserLoginDto;
+import dev.mvasylenko.core.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,15 +42,15 @@ public class AuthController {
     }
 
 
-//    @PostMapping("/driver/registration")
-//    public ResponseEntity<Map<String, String>> driverRegistration(@RequestBody @Valid DriverDto driverDto) {
-//        return authenticationService.register(driverDto);
-//    }
-//
-//    @PostMapping("/passenger/registration")
-//    public ResponseEntity<Map<String, String>> passengerRegistration(@RequestBody @Valid PassengerDto passengerDto) {
-//        return authenticationService.register(passengerDto);
-//    }
+    @PostMapping("/driver/registration")
+    public AuthUserDto driverRegistration(@RequestBody @Valid DriverRegistrationDto driverDto) {
+        return authenticationService.register(driverDto);
+    }
+
+    @PostMapping("/passenger/registration")
+    public AuthUserDto passengerRegistration(@RequestBody @Valid PassengerRegistrationDto passengerDto) {
+        return authenticationService.register(passengerDto);
+    }
 
     @GetMapping("/login")
     public Map<String, String> login() {

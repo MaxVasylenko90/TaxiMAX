@@ -71,6 +71,21 @@ services:
     volumes:
       - kafka3_data:/bitnami/kafka
 
+  postgres-auth:
+    image: 'postgres:latest'
+    container_name: postgres_auth
+    restart: always
+    networks:
+      - kafka-net
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: nimda
+      POSTGRES_DB: authServiceDb
+    ports:
+      - "5431:5432"
+    volumes:
+      - postgres_auth_data:/var/lib/postgresql/data
+
   postgres-car:
     image: 'postgres:latest'
     container_name: postgres_car
@@ -116,6 +131,32 @@ services:
     volumes:
       - postgres_payment_data:/var/lib/postgresql/data
 
+  postgres-passenger:
+    image: 'postgres:latest'
+    container_name: postgres_passenger
+    restart: always
+    networks:
+      - kafka-net
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: nimda
+      POSTGRES_DB: passengerServiceDb
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_passenger_data:/var/lib/postgresql/data
+
+  redis-auth:
+    image: redis:latest
+    container_name: redis_auth
+    networks:
+      - kafka-net
+    ports:
+      - "6378:6379"
+    restart: always
+    volumes:
+      - redis_auth_data:/data
+
   redis-car:
     image: redis:latest
     container_name: redis_car
@@ -149,13 +190,28 @@ services:
     volumes:
       - redis_payment_data:/data
 
+  redis-passenger:
+    image: redis:latest
+    container_name: redis_passenger
+    networks:
+      - kafka-net
+    ports:
+      - "6382:6379"
+    restart: always
+    volumes:
+      - redis_passenger_data:/data
+
 volumes:
   kafka1_data:
   kafka2_data:
   kafka3_data:
+  postgres_auth_data:
   postgres_car_data:
   postgres_driver_data:
   postgres_payment_data:
+  postgres_passenger_data:
+  redis_auth_data:
   redis_car_data:
   redis_driver_data:
   redis_payment_data:
+  redis_passenger_data:

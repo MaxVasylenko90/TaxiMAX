@@ -1,5 +1,6 @@
 package dev.mvasylenko.authservice.handler;
 
+import dev.mvasylenko.authservice.exception.RegistrationFailedException;
 import dev.mvasylenko.core.dto.ErrorResponseDto;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.ServletException;
@@ -56,5 +57,11 @@ public class AuthExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponseDto handleNoSuchElementException(NoSuchElementException e) {
         return new ErrorResponseDto("NO_SUCH_ELEMENT_EXCEPTION", e.getMessage());
+    }
+
+    @ExceptionHandler(RegistrationFailedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponseDto handleRegistrationFailedException(RegistrationFailedException e) {
+        return new ErrorResponseDto("REGISTRATION_FAILED_EXCEPTION", e.getMessage());
     }
 }

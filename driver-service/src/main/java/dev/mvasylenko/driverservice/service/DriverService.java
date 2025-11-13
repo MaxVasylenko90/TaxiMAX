@@ -4,7 +4,6 @@ import dev.mvasylenko.core.commands.WithdrawDriverAmountCommand;
 import dev.mvasylenko.core.dto.CarDto;
 import dev.mvasylenko.core.dto.DriverDto;
 import dev.mvasylenko.core.dto.RentCarRequest;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Map;

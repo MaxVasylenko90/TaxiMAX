@@ -1,23 +1,22 @@
 package dev.mvasylenko.authservice.service.impl;
 
 import dev.mvasylenko.authservice.entity.AuthUser;
+import dev.mvasylenko.authservice.exception.RegistrationFailedException;
+import dev.mvasylenko.authservice.mapper.AuthUserMapper;
 import dev.mvasylenko.authservice.repository.AuthUserRepository;
 import dev.mvasylenko.authservice.security.jwt.JwtService;
 import dev.mvasylenko.authservice.service.AuthenticationService;
-import dev.mvasylenko.core.dto.UserLoginDto;
+import dev.mvasylenko.core.dto.*;
 import dev.mvasylenko.core.enums.Role;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
@@ -68,15 +67,54 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public AuthUser registerNewOAuth2User(OAuth2User oauthUser) {
         String email = oauthUser.getAttribute(EMAIL);
         String name = oauthUser.getAttribute(NAME);
+        UUID uuid = createPassenger(email, name).getId();
 
-        AuthUser newUser = new AuthUser();
-        newUser.setEmail(email);
-        newUser.setRole(Role.PASSENGER);
+        return createAuthUser(email, uuid, Role.PASSENGER);
+    }
 
-        var uuid = UUID.fromString(createPassenger(email, name).get(ID));
-        newUser.setExternalId(uuid);
+    @Override
+    public AuthUserDto register(DriverRegistrationDto driverRegistrationDto) {
+        return null;
+    }
 
-        return userRepository.save(newUser);
+    @Override
+    public AuthUserDto register(PassengerRegistrationDto passengerRegistrationDto) {
+        var httpEntity = createHttpEntity(passengerRegistrationDto);
+
+        UserDto userDto  = (UserDto) restTemplate.exchange(passengerServiceUrl + "/create", HttpMethod.POST,
+                        httpEntity, new ParameterizedTypeReference<>() {}).getBody();
+
+        if (userDto == null) {
+            throw new RegistrationFailedException("PassengerService return null object after registration");
+        }
+
+        var authUser = createAuthUser(userDto.getEmail(), userDto.getId(), Role.PASSENGER);
+        return AuthUserMapper.INSTANCE.authUserToAuthUserDto(authUser);
+    }
+
+    private UserDto createPassenger(String email, String name) {
+        Map<String, String> body = Map.of(EMAIL, email, NAME, name);
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body);
+
+       return (UserDto) restTemplate.exchange(passengerServiceUrl + "/create", HttpMethod.POST,
+                        entity, new ParameterizedTypeReference<>() {
+                }).getBody();
+    }
+
+    private HttpEntity<PassengerRegistrationDto> createHttpEntity(PassengerRegistrationDto passengerRegistrationDto) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new HttpEntity<>(passengerRegistrationDto, headers);
+    }
+
+    private AuthUser createAuthUser(String email, UUID externalId, Role role) {
+        AuthUser user = new AuthUser();
+        user.setEmail(email);
+        user.setRole(role);
+        user.setExternalId(externalId);
+
+        return userRepository.save(user);
     }
 
     private ResponseEntity<Map<String, String>> generateNewTokens(String email) {
@@ -95,17 +133,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private ResponseEntity<Map<String, String>> getResponseEntity(HttpStatus status, String key, String value) {
         return ResponseEntity.status(status).body(Collections.singletonMap(key, value));
-    }
-
-    private Map<String, String> createPassenger(String email, String name) {
-        final String url = passengerServiceUrl + "/create";
-
-        Map<String, String> body = Map.of(EMAIL, email, NAME, name);
-        HttpEntity< Map<String, String>> entity = new HttpEntity<>(body);
-
-        ResponseEntity<Map<String, String>> response = restTemplate.exchange(
-                url, HttpMethod.POST, entity, new ParameterizedTypeReference<>() {});
-
-        return response.getBody();
     }
 }

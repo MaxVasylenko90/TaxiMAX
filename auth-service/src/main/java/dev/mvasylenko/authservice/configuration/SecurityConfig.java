@@ -29,21 +29,19 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
     private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
     @Autowired
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,
                                  @Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService,
-                                 @Qualifier("oauth2UserServiceImpl") OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService,
-                                 @Qualifier("oAuth2AuthenticationSuccessHandler") AuthenticationSuccessHandler authenticationSuccessHandler) {
+                                 @Qualifier("oauth2UserServiceImpl") OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
         this.oAuth2UserService = oAuth2UserService;
-        this.authenticationSuccessHandler = authenticationSuccessHandler;
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           @Qualifier("oAuth2AuthenticationSuccessHandler") AuthenticationSuccessHandler successHandler) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -55,7 +53,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
-                        .successHandler(authenticationSuccessHandler)
+                        .successHandler(successHandler)
                 )
                 .authenticationProvider(getAuthenticationProvider(getPasswordEncoder(), userDetailsService))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

@@ -6,7 +6,7 @@ CREATE TABLE passenger
     password      VARCHAR(50)        NOT NULL,
     email         VARCHAR(50) UNIQUE NOT NULL,
     phone         VARCHAR(9)         NOT NULL,
-    average_rating NUMERIC(3, 2)      NOT NULL, CONSTRAINT check_rating_range CHECK (averageRating BETWEEN 0 AND 5),
+    average_rating NUMERIC(3, 2)      NOT NULL, CONSTRAINT check_rating_range CHECK (average_rating BETWEEN 0 AND 5),
     amount        NUMERIC(10, 2)     NOT NULL, CONSTRAINT check_amount_nonnegative CHECK (amount >= 0)
 );
 

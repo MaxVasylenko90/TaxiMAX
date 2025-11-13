@@ -1,5 +1,7 @@
 package dev.mvasylenko.passengerservice.web.controller;
 
+import dev.mvasylenko.core.dto.PassengerDto;
+import dev.mvasylenko.core.dto.PassengerRegistrationDto;
 import dev.mvasylenko.passengerservice.exception.PassengerAlreadyExistExeption;
 import dev.mvasylenko.passengerservice.service.PassengerService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,20 +21,15 @@ public class PassengerController {
     }
 
     @PostMapping("/create")
-    public Map<String, String> createNewPassenger(Map<String, String> attributes) {
+    public PassengerDto createNewPassenger(Map<String, String> attributes) {
         var email = attributes.get(EMAIL);
         var name = attributes.get(NAME);
 
-        var existedPassenger = passengerService.findByEmail(email);
-        if (existedPassenger != null) {
-            throw new PassengerAlreadyExistExeption("Passenger with email " + email + " already exists!");
-        }
+       return passengerService.createNewPassenger(email, name);
+    }
 
-        var passenger = passengerService.createNewPassenger(email, name);
-
-        Map<String, String> result = new HashMap<>();
-        result.put("id", passenger.getId().toString());
-
-        return result;
+    @PostMapping(value = "/create", consumes = "application/json")
+    public PassengerDto createNewPassenger(PassengerRegistrationDto registrationDto) {
+        return passengerService.createNewPassenger(registrationDto);
     }
 }

@@ -1,0 +1,68 @@
+package dev.mvasylenko.core.dto;
+
+import dev.mvasylenko.core.enums.Role;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.UUID;
+
+public class AuthUserDto {
+    @NotNull
+    private UUID id;
+
+    @Email
+    @NotBlank
+    private String email;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private Role role;
+
+    @NotNull
+    private UUID externalId;
+
+    public AuthUserDto() {
+    }
+
+    public AuthUserDto(UUID id, String email, Role role, UUID externalId) {
+        this.id = id;
+        this.email = email;
+        this.role = role;
+        this.externalId = externalId;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public UUID getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(UUID externalId) {
+        this.externalId = externalId;
+    }
+}

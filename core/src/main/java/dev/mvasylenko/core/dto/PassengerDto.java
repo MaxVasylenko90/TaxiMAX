@@ -48,7 +48,8 @@ public class PassengerDto {
         super();
     }
 
-    public PassengerDto(UUID id, String name, String surname, String password, String email, BigDecimal amount, String phone, BigDecimal averageRating, List<String> comments, Set<UUID> rideHistory) {
+    public PassengerDto(UUID id, String name, String surname, String password, String email, BigDecimal amount,
+                        String phone, BigDecimal averageRating, List<String> comments, Set<UUID> rideHistory) {
         this.id = id;
         this.name = name;
         this.surname = surname;
