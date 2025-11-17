@@ -146,60 +146,16 @@ services:
     volumes:
       - postgres_passenger_data:/var/lib/postgresql/data
 
-  redis-auth:
+  redis:
     image: redis:latest
-    container_name: redis_auth
-    networks:
-      - kafka-net
-    ports:
-      - "6378:6379"
-    restart: always
-    volumes:
-      - redis_auth_data:/data
-
-  redis-car:
-    image: redis:latest
-    container_name: redis_car
+    container_name: redis
     networks:
       - kafka-net
     ports:
       - "6379:6379"
     restart: always
     volumes:
-      - redis_car_data:/data
-
-  redis-driver:
-    image: redis:latest
-    container_name: redis_driver
-    networks:
-      - kafka-net
-    ports:
-      - "6380:6379"
-    restart: always
-    volumes:
-      - redis_driver_data:/data
-
-  redis-payment:
-    image: redis:latest
-    container_name: redis_payment
-    networks:
-      - kafka-net
-    ports:
-      - "6381:6379"
-    restart: always
-    volumes:
-      - redis_payment_data:/data
-
-  redis-passenger:
-    image: redis:latest
-    container_name: redis_passenger
-    networks:
-      - kafka-net
-    ports:
-      - "6382:6379"
-    restart: always
-    volumes:
-      - redis_passenger_data:/data
+      - redis_data:/data
 
 volumes:
   kafka1_data:
@@ -210,8 +166,4 @@ volumes:
   postgres_driver_data:
   postgres_payment_data:
   postgres_passenger_data:
-  redis_auth_data:
-  redis_car_data:
-  redis_driver_data:
-  redis_payment_data:
-  redis_passenger_data:
+  redis_data:

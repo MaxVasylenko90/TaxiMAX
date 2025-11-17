@@ -1,12 +1,9 @@
 package dev.mvasylenko.passengerservice.service;
 
-import dev.mvasylenko.core.dto.PassengerDto;
-import dev.mvasylenko.core.dto.PassengerRegistrationDto;
-import dev.mvasylenko.passengerservice.entity.Passenger;
+import dev.mvasylenko.core.events.UserRegisteredEvent;
+import org.springframework.kafka.support.Acknowledgment;
 
 public interface PassengerService {
+    void createPassenger(UserRegisteredEvent event, String kafkaMessageKey, Acknowledgment acknowledgment);
 
-    PassengerDto createNewPassenger(String email, String name);
-
-    PassengerDto createNewPassenger(PassengerRegistrationDto registrationDto);
 }

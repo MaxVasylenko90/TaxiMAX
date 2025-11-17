@@ -29,24 +29,6 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisConnectionFactory eventsRedisConnectionFactory() {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
-        config.setHostName("localhost");
-        config.setPort(6380);
-        config.setDatabase(0);
-        return new LettuceConnectionFactory(config);
-    }
-
-    @Bean
-    public RedisConnectionFactory commandsRedisConnectionFactory() {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
-        config.setHostName("localhost");
-        config.setPort(6380);
-        config.setDatabase(1);
-        return new LettuceConnectionFactory(config);
-    }
-
-    @Bean
     public RedisTemplate<UUID, Object> eventsRedisTemplate() {
         RedisTemplate<UUID, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(eventsRedisConnectionFactory());
@@ -54,9 +36,27 @@ public class RedisConfig {
     }
 
     @Bean
+    public RedisConnectionFactory eventsRedisConnectionFactory() {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName("localhost");
+        config.setPort(6379);
+        config.setDatabase(0);
+        return new LettuceConnectionFactory(config);
+    }
+
+    @Bean
     public RedisTemplate<UUID, Object> commandsRedisTemplate() {
         RedisTemplate<UUID, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(commandsRedisConnectionFactory());
         return template;
+    }
+
+    @Bean
+    public RedisConnectionFactory commandsRedisConnectionFactory() {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName("localhost");
+        config.setPort(6379);
+        config.setDatabase(1);
+        return new LettuceConnectionFactory(config);
     }
 }

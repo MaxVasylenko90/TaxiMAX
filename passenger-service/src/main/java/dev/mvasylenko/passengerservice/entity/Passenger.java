@@ -5,6 +5,7 @@ import dev.mvasylenko.core.model.User;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "passenger")
@@ -14,11 +15,11 @@ public class Passenger extends User {
         super();
     }
 
-    public Passenger(String name, String surname, String password, String email, String phone, BigDecimal amount) {
-        super(name, surname, password, email, phone, amount);
+    public Passenger(UUID id, String name, String surname, String email, String phone, BigDecimal amount) {
+        super(id, name, surname, email, phone, amount);
     }
 
-    public Passenger(String email, String name) {
-        super(email,name, Role.PASSENGER);
+    public Passenger(UUID id, String email, String name) {
+        super(id, email,name, Role.PASSENGER);
     }
 }

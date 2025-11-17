@@ -1,4 +1,4 @@
-package dev.mvasylenko.paymentservice.config;
+package dev.mvasylenko.passengerservice.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;

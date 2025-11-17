@@ -11,7 +11,6 @@ public class CoreConstants {
     public static final String EMAIL = "email";
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String AUTHORIZATION = "Authorization";
-    public static final String EXTERNAL_ID = "externalId";
     public static final String ROLE = "role";
     public static final String ROLE_PREFIX ="ROLE_";
     public static final String NAME = "name";

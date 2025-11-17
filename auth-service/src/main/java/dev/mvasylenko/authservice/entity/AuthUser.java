@@ -2,9 +2,7 @@ package dev.mvasylenko.authservice.entity;
 
 import dev.mvasylenko.core.enums.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,25 +19,35 @@ public class AuthUser implements UserDetails {
     private UUID id;
 
     @Column(name = "email")
+    @Size(min = 2, max = 30)
     @Email
     @NotBlank
     private String email;
+
+    @Column(name = "password")
+    @Size(min = 8, max = 50, message = "Password must contain between 8 and 50 characters")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,50}$",
+            message = "Password must contain uppercase, lowercase, number and special character"
+    )
+    private String password;
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     @NotNull
     private Role role;
 
-    @NotNull
-    private UUID externalId;
-
     public AuthUser() {
     }
 
-    public AuthUser(String email, Role role, UUID externalId) {
+    public AuthUser(String email, String password, Role role) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public AuthUser(String email, Role role) {
         this.email = email;
         this.role = role;
-        this.externalId = externalId;
     }
 
     @Override
@@ -49,7 +57,7 @@ public class AuthUser implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "";
+        return password;
     }
 
     @Override
@@ -97,11 +105,11 @@ public class AuthUser implements UserDetails {
         this.role = role;
     }
 
-    public UUID getExternalId() {
-        return externalId;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
-    public void setExternalId(UUID externalId) {
-        this.externalId = externalId;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

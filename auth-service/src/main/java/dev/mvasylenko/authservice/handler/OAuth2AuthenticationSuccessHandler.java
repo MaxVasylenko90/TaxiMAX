@@ -42,7 +42,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 authenticationService.registerNewOAuth2User(oauthUser));
 
         Map<String, Object> claims = Map.of(
-                EXTERNAL_ID, user.getExternalId().toString(),
+                ID, user.getId().toString(),
                 ROLE, user.getRole().name()
         );
 

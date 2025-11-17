@@ -1,23 +1,25 @@
 package dev.mvasylenko.authservice.service.impl;
 
 import dev.mvasylenko.authservice.entity.AuthUser;
-import dev.mvasylenko.authservice.exception.RegistrationFailedException;
 import dev.mvasylenko.authservice.mapper.AuthUserMapper;
 import dev.mvasylenko.authservice.repository.AuthUserRepository;
 import dev.mvasylenko.authservice.security.jwt.JwtService;
 import dev.mvasylenko.authservice.service.AuthenticationService;
 import dev.mvasylenko.core.dto.*;
 import dev.mvasylenko.core.enums.Role;
+import dev.mvasylenko.core.events.UserRegisteredEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 import java.util.Map;
@@ -27,21 +29,24 @@ import static dev.mvasylenko.core.constants.CoreConstants.*;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
-
+    private static final Logger LOG = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
     private final AuthenticationManager authenticationManager;
     private final AuthUserRepository userRepository;
     private final JwtService jwtService;
-    private final RestTemplate restTemplate;
-    private final String passengerServiceUrl;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final String registrationTopicName;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthenticationServiceImpl(AuthenticationManager authenticationManager, AuthUserRepository userRepository,
-                                     JwtService jwtService, RestTemplate restTemplate,
-                                     @Value("${passenger.service.url}") String passengerServiceUrl) {
+                                     JwtService jwtService, KafkaTemplate<String, Object> kafkaTemplate,
+                                     @Value("registration.topic.name") String registrationTopicName,
+                                     PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
-        this.restTemplate = restTemplate;
-        this.passengerServiceUrl = passengerServiceUrl;
+        this.kafkaTemplate = kafkaTemplate;
+        this.registrationTopicName = registrationTopicName;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -55,7 +60,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public ResponseEntity<Map<String, String>> refreshAccessToken(String refreshToken) {
         if (!jwtService.isRefreshTokenValid(refreshToken)) {
             jwtService.deleteRefreshToken(refreshToken);
-            return getResponseEntity(HttpStatus.FORBIDDEN, MESSAGE, "Invalid refresh token. Please log in again.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap(
+                    MESSAGE, "Invalid refresh token. Please log in again."));
         }
         var email = jwtService.extractEmailFromTokenClaims(refreshToken);
         jwtService.deleteRefreshToken(refreshToken);
@@ -65,56 +71,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public AuthUser registerNewOAuth2User(OAuth2User oauthUser) {
-        String email = oauthUser.getAttribute(EMAIL);
-        String name = oauthUser.getAttribute(NAME);
-        UUID uuid = createPassenger(email, name).getId();
+        final String email = oauthUser.getAttribute(EMAIL);
+        final String name = oauthUser.getAttribute(NAME);
 
-        return createAuthUser(email, uuid, Role.PASSENGER);
+        AuthUser authUser = new AuthUser(email, Role.PASSENGER);
+        var registeredUser = userRepository.save(authUser);
+
+        UserRegisteredEvent event = createUserRegisteredEvent(authUser.getId(), email, name, Role.PASSENGER);
+        kafkaTemplate.send(registrationTopicName, registeredUser.getId().toString(), event);
+
+        LOG.info("AuthUser with email = {} has been registered successfully", email);
+        return registeredUser;
     }
 
     @Override
-    public AuthUserDto register(DriverRegistrationDto driverRegistrationDto) {
-        return null;
-    }
+    @Transactional
+    public AuthUserDto register(UserRegistrationDto userDto, Role role) {
+        AuthUser authUser = new AuthUser(
+                userDto.getEmail(), passwordEncoder.encode(userDto.getPassword()), role);
+        userRepository.save(authUser);
 
-    @Override
-    public AuthUserDto register(PassengerRegistrationDto passengerRegistrationDto) {
-        var httpEntity = createHttpEntity(passengerRegistrationDto);
+        kafkaTemplate.send(registrationTopicName, authUser.getId().toString(),
+                createUserRegisteredEvent(authUser.getId(), userDto, role));
 
-        UserDto userDto  = (UserDto) restTemplate.exchange(passengerServiceUrl + "/create", HttpMethod.POST,
-                        httpEntity, new ParameterizedTypeReference<>() {}).getBody();
-
-        if (userDto == null) {
-            throw new RegistrationFailedException("PassengerService return null object after registration");
-        }
-
-        var authUser = createAuthUser(userDto.getEmail(), userDto.getId(), Role.PASSENGER);
         return AuthUserMapper.INSTANCE.authUserToAuthUserDto(authUser);
-    }
-
-    private UserDto createPassenger(String email, String name) {
-        Map<String, String> body = Map.of(EMAIL, email, NAME, name);
-        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body);
-
-       return (UserDto) restTemplate.exchange(passengerServiceUrl + "/create", HttpMethod.POST,
-                        entity, new ParameterizedTypeReference<>() {
-                }).getBody();
-    }
-
-    private HttpEntity<PassengerRegistrationDto> createHttpEntity(PassengerRegistrationDto passengerRegistrationDto) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        return new HttpEntity<>(passengerRegistrationDto, headers);
-    }
-
-    private AuthUser createAuthUser(String email, UUID externalId, Role role) {
-        AuthUser user = new AuthUser();
-        user.setEmail(email);
-        user.setRole(role);
-        user.setExternalId(externalId);
-
-        return userRepository.save(user);
     }
 
     private ResponseEntity<Map<String, String>> generateNewTokens(String email) {
@@ -122,7 +102,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new UsernameNotFoundException("User with current email wasn't found!"));
 
         Map<String, Object> claims = Map.of(
-                EXTERNAL_ID, user.getExternalId().toString(),
+                ID, user.getId().toString(),
                 ROLE, user.getRole().name()
         );
 
@@ -131,7 +111,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         REFRESH_TOKEN, jwtService.generateRefreshToken(user, claims)));
     }
 
-    private ResponseEntity<Map<String, String>> getResponseEntity(HttpStatus status, String key, String value) {
-        return ResponseEntity.status(status).body(Collections.singletonMap(key, value));
+    private UserRegisteredEvent createUserRegisteredEvent(UUID userId, String email, String name, Role role) {
+        UserRegisteredEvent event = new UserRegisteredEvent();
+        event.setUserId(userId);
+        event.setEmail(email);
+        event.setName(name);
+        event.setRole(role);
+        return event;
+    }
+
+    private UserRegisteredEvent createUserRegisteredEvent(UUID userId, UserRegistrationDto userDto, Role role) {
+        UserRegisteredEvent event = new UserRegisteredEvent();
+        event.setUserId(userId);
+        event.setName(userDto.getName());
+        event.setSurname(userDto.getSurname());
+        event.setEmail(userDto.getEmail());
+        event.setPhone(userDto.getPhone());
+        event.setRole(role);
+        event.setDriverInfo(userDto.getDriverInfo());
+        return event;
     }
 }

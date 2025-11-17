@@ -10,7 +10,6 @@ import java.util.*;
 @MappedSuperclass
 public abstract class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name")
@@ -22,11 +21,6 @@ public abstract class User {
     @NotNull(message = "Surname is required!")
     @Size(min = 2, max = 50)
     private String surname;
-
-    @Column(name = "password")
-    @NotBlank(message = "Password is required!")
-    @Size(min = 2, max = 50)
-    private String password;
 
     @Column(unique = true, nullable = false)
     @NotBlank(message = "Email is required!")
@@ -73,22 +67,20 @@ public abstract class User {
     public User() {
     }
 
-    public User(String name, String surname, String password, String email, String phone, BigDecimal amount) {
+    public User(UUID id, String name, String surname, String email, String phone, BigDecimal amount) {
+        this.id = id;
         this.name = name;
         this.surname = surname;
-        this.password = password;
         this.email = email;
         this.phone = phone;
         this.amount = amount;
     }
 
-    public User (String email, String name, Role role) {
+    public User (UUID id, String email, String name, Role role) {
+        this.id = id;
         this.email = email;
         this.name = name;
         this.role = role;
-        this.surname = "";
-        this.password = "";
-        this.phone = "";
     }
 
     public String getName() {
@@ -97,14 +89,6 @@ public abstract class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {
@@ -173,5 +157,9 @@ public abstract class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 }

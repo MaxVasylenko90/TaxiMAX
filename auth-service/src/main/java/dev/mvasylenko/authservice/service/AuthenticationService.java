@@ -2,6 +2,7 @@ package dev.mvasylenko.authservice.service;
 
 import dev.mvasylenko.authservice.entity.AuthUser;
 import dev.mvasylenko.core.dto.*;
+import dev.mvasylenko.core.enums.Role;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -31,16 +32,10 @@ public interface AuthenticationService {
     AuthUser registerNewOAuth2User(OAuth2User oauthUser);
 
     /**
-     * Driver registration
-     * @param driverDto
+     * User registration
+     * @param userDto
+     * @param role
      * @return AuthUserDto object
      */
-    AuthUserDto register(@Valid DriverRegistrationDto driverDto);
-
-    /**
-     * Passenger registration
-     * @param passengerDto
-     * @return AuthUserDto object
-     */
-    AuthUserDto register(@Valid PassengerRegistrationDto passengerDto);
+    AuthUserDto register(@Valid UserRegistrationDto userDto, Role role);
 }

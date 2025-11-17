@@ -3,7 +3,6 @@ CREATE TABLE driver
     id                    UUID PRIMARY KEY,
     name                  VARCHAR(50)        NOT NULL,
     surname               VARCHAR(50)        NOT NULL,
-    password              VARCHAR(50)        NOT NULL,
     email                 VARCHAR(50) UNIQUE NOT NULL,
     phone                 VARCHAR(9)         NOT NULL,
     average_rating        NUMERIC(3, 2)      NOT NULL,

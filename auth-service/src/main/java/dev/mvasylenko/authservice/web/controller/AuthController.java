@@ -5,6 +5,7 @@ import dev.mvasylenko.authservice.mapper.AuthUserMapper;
 import dev.mvasylenko.authservice.security.jwt.JwtService;
 import dev.mvasylenko.authservice.service.AuthenticationService;
 import dev.mvasylenko.core.dto.*;
+import dev.mvasylenko.core.enums.Role;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,20 +37,19 @@ public class AuthController {
         return Collections.singletonMap(MESSAGE, "This is driver registration page");
     }
 
+    @PostMapping("/driver/registration")
+    public AuthUserDto driverRegistration(@RequestBody @Valid UserRegistrationDto userDto) {
+        return authenticationService.register(userDto, Role.DRIVER);
+    }
+
     @GetMapping("/passenger/registration")
     public Map<String, String> passengerRegistration() {
         return Collections.singletonMap(MESSAGE, "This is passenger registration page");
     }
 
-
-    @PostMapping("/driver/registration")
-    public AuthUserDto driverRegistration(@RequestBody @Valid DriverRegistrationDto driverDto) {
-        return authenticationService.register(driverDto);
-    }
-
     @PostMapping("/passenger/registration")
-    public AuthUserDto passengerRegistration(@RequestBody @Valid PassengerRegistrationDto passengerDto) {
-        return authenticationService.register(passengerDto);
+    public AuthUserDto passengerRegistration(@RequestBody @Valid UserRegistrationDto userDto) {
+        return authenticationService.register(userDto, Role.PASSENGER);
     }
 
     @GetMapping("/login")

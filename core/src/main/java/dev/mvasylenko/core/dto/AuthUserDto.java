@@ -21,17 +21,13 @@ public class AuthUserDto {
     @NotNull
     private Role role;
 
-    @NotNull
-    private UUID externalId;
-
     public AuthUserDto() {
     }
 
-    public AuthUserDto(UUID id, String email, Role role, UUID externalId) {
+    public AuthUserDto(UUID id, String email, Role role) {
         this.id = id;
         this.email = email;
         this.role = role;
-        this.externalId = externalId;
     }
 
     public UUID getId() {
@@ -56,13 +52,5 @@ public class AuthUserDto {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public UUID getExternalId() {
-        return externalId;
-    }
-
-    public void setExternalId(UUID externalId) {
-        this.externalId = externalId;
     }
 }
