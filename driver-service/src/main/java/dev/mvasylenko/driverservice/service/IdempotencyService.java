@@ -4,28 +4,15 @@ import java.util.UUID;
 
 public interface IdempotencyService {
     /**
-     * Check whether event has already processed
-     * @param eventKey
-     * @return true if command has already processed, otherwith - false
+     * Trying to add event/command key to redis database
+     * @param key
+     * @return true - for new key; false - if key already exist
      */
-    boolean isEventProcessed(UUID eventKey);
+    boolean tryAcquire(String key);
 
     /**
-     * Marking event as processed in redis
-     * @param eventKey
+     * Marks event/command by key as done
+     * @param key
      */
-    void markEventAsProcessed(UUID eventKey);
-
-    /**
-     * Check whether command has already processed
-     * @param commandKey
-     * @return true if command has already processed, otherwith - false
-     */
-    boolean isCommandProcessed(UUID commandKey);
-
-    /**
-     * Marking command as processed in redis
-     * @param commandKey
-     */
-    void markCommandAsProcessed(UUID commandKey);
+    void markAsDone(String key);
 }

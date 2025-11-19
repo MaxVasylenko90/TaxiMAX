@@ -48,7 +48,7 @@ public class PaymentCommandsHandler {
     @KafkaHandler
     public void handleCommand(@Payload CreatePaymentCommand command,
                               @Header(KafkaHeaders.RECEIVED_KEY) String kafkaMessageKey) {
-        handle(command.getCommandId(), () -> {
+        handle(command.getCommandId().toString(), () -> {
             PaymentDto payment = paymentService.processRentPayment(command.getDriverId(), command.getCarRentPrice());
 
             PaymentCreatedEvent event = new PaymentCreatedEvent(payment.getId(), payment.getSenderId(), payment.getAmount());
@@ -61,7 +61,7 @@ public class PaymentCommandsHandler {
     @KafkaHandler
     public void handleCommand(@Payload CommitPaymentCommand command,
                               @Header(KafkaHeaders.RECEIVED_KEY) String kafkaMessageKey) {
-        handle(command.getCommandId(), () -> {
+        handle(command.getCommandId().toString(), () -> {
             paymentService.changePaymentStatus(command.getPaymentId(), PaymentStatus.COMPLETED);
 
             PaymentCommitedEvent event = new PaymentCommitedEvent(UUID.fromString(kafkaMessageKey));
@@ -72,7 +72,7 @@ public class PaymentCommandsHandler {
     @KafkaHandler
     public void handleCommand(@Payload RollbackPaymentCommand command,
                               @Header(KafkaHeaders.RECEIVED_KEY) String kafkaMessageKey) {
-        handle(command.getCommandId(), () -> {
+        handle(command.getCommandId().toString(), () -> {
             paymentService.changePaymentStatus(command.getPaymentId(), PaymentStatus.CANCELLED);
 
             PaymentCancelledEvent event = new PaymentCancelledEvent(UUID.fromString(kafkaMessageKey),
@@ -81,14 +81,15 @@ public class PaymentCommandsHandler {
         });
     }
 
-    private void handle(UUID commandId, Runnable runnable) {
-        if (idempotencyService.isCommandProcessed(commandId)) {
-            LOG.info("Command with id={} has already processed! Skipping.", commandId);
+    private void handle(String id, Runnable runnable) {
+        final String key = "command:" + id;
+        if (!idempotencyService.tryAcquire(key)) {
+            LOG.info("Command with id={} has already processed! Skipping.", id);
             return;
         }
         try {
             runnable.run();
-            idempotencyService.markCommandAsProcessed(commandId);
+            idempotencyService.markAsDone(key);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             throw e;

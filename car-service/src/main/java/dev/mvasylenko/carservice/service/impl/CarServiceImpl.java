@@ -108,19 +108,16 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public void changeCarRentalStatus(UUID carId, CarRentalStatus status, String kafkaMessageKey, UUID senderId) {
-        carRentalHistoryService.add(carId, senderId, status);
-    }
-
-    @Override
     @Transactional
-    public void releaseCar(UUID carId) {
+    public void releaseCar(UUID carId, CarRentalStatus status, String kafkaMessageKey, UUID senderId) {
         var car = getCarById(carId);
         car.setAvailable(Boolean.TRUE);
         car.setDriverId(null);
         carRepository.save(car);
 
         LOG.info("Car with id={} has been released and is again available for rental.", carId);
+
+        carRentalHistoryService.add(carId, senderId, status);
     }
 
     private void validateIds(UUID carId, RentCarRequest request) {

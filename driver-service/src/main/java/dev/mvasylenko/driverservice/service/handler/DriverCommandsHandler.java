@@ -31,26 +31,27 @@ public class DriverCommandsHandler {
     @KafkaHandler
     public void handleCommand(@Payload WithdrawDriverAmountCommand command,
                               @Header(KafkaHeaders.RECEIVED_KEY) String kafkaMessageKey) {
-        handle(command.getCommandId(), () -> {
+        handle(command.getCommandId().toString(), () -> {
             driverService.withdraw(command, kafkaMessageKey);
         });
     }
 
     @KafkaHandler
     public void handleCommand(@Payload AssignCarToDriverCommand command) {
-        handle(command.getCommandId(), () -> {
+        handle(command.getCommandId().toString(), () -> {
             driverService.assignCarForDriver(command.getCarId(), command.getDriverId());
         });
     }
 
-    private void handle(UUID commandId, Runnable runnable) {
-        if (idempotencyService.isCommandProcessed(commandId)) {
-            LOG.info("Command with id={} has already processed! Skipping.", commandId);
+    private void handle(String id, Runnable runnable) {
+        final String key = "command:" + id;
+        if (!idempotencyService.tryAcquire(key)) {
+            LOG.info("Command with id={} has already processed! Skipping.", id);
             return;
         }
         try {
             runnable.run();
-            idempotencyService.markCommandAsProcessed(commandId);
+            idempotencyService.markAsDone(key);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             throw e;

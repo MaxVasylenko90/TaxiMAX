@@ -31,6 +31,8 @@ public class CarRentalHistoryServiceImpl implements CarRentalHistoryService {
     @Override
     public List<CarRentalHistoryDto> getCarRentalHistory(UUID carId) {
         var histories = repository.findByCarId(carId);
-        return histories.stream().map(CarRentalHistoryMapper.INSTANCE::historyToHistoryDto).toList();
+        return histories.stream()
+                .map(CarRentalHistoryMapper.INSTANCE::historyToHistoryDto)
+                .toList();
     }
 }

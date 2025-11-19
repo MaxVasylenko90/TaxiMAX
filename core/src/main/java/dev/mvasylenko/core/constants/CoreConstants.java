@@ -15,4 +15,7 @@ public class CoreConstants {
     public static final String ROLE_PREFIX ="ROLE_";
     public static final String NAME = "name";
     public static final String ID = "id";
+    public static final String DONE = "DONE";
+    public static final String PROCESSING = "PROCESSING";
+    public static final int REDIS_KEY_TTL_MINUTES = 5;
 }

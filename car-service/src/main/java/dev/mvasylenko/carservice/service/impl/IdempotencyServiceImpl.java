@@ -1,43 +1,29 @@
 package dev.mvasylenko.carservice.service.impl;
 
 import dev.mvasylenko.carservice.service.IdempotencyService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static dev.mvasylenko.core.constants.CoreConstants.*;
 
 @Service
 public class IdempotencyServiceImpl implements IdempotencyService {
-    private final RedisTemplate<UUID, Object> eventsRedisTemplate;
-    private final RedisTemplate<UUID, Object> commandsRedisTemplate;
-    private static final long TTL_HOURS = 24;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    public IdempotencyServiceImpl(@Qualifier("eventsRedisTemplate") RedisTemplate<UUID, Object> eventsRedisTemplate,
-                                  @Qualifier("commandsRedisTemplate") RedisTemplate<UUID, Object> commandsRedisTemplate) {
-        this.eventsRedisTemplate = eventsRedisTemplate;
-        this.commandsRedisTemplate = commandsRedisTemplate;
+    public IdempotencyServiceImpl(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
-    public boolean isEventProcessed(UUID key) {
-        return eventsRedisTemplate.hasKey(key);
+    public boolean tryAcquire(String key) {
+        Boolean ok = redisTemplate.opsForValue().setIfAbsent(key, PROCESSING, REDIS_KEY_TTL_MINUTES, TimeUnit.MINUTES);
+        return Boolean.TRUE.equals(ok);
     }
 
     @Override
-    public void markEventAsProcessed(UUID key) {
-        eventsRedisTemplate.opsForValue().set(key, true, TTL_HOURS, TimeUnit.HOURS);
-    }
-
-    @Override
-    public boolean isCommandProcessed(UUID commandKey) {
-        return commandsRedisTemplate.hasKey(commandKey);
-    }
-
-    @Override
-    public void markCommandAsProcessed(UUID commandKey) {
-        commandsRedisTemplate.opsForValue().set(commandKey, true, TTL_HOURS, TimeUnit.HOURS);
+    public void markAsDone(String key) {
+        redisTemplate.opsForValue().set(key, DONE, REDIS_KEY_TTL_MINUTES, TimeUnit.SECONDS);
     }
 }
 

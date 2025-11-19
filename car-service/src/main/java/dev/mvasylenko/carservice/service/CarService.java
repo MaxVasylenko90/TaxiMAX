@@ -53,16 +53,11 @@ public interface CarService {
     void changeCarRentalStatus(UUID carId, CarRentalStatus status, String kafkaMessageKey);
 
     /**
-     * Change car rental status
+     * Release car
+     * @param carId
      * @param status
      * @param kafkaMessageKey
      * @param senderId
      */
-    void changeCarRentalStatus(UUID carId, CarRentalStatus status, String kafkaMessageKey, UUID senderId);
-
-    /**
-     * Release car
-     * @param carId
-     */
-    void releaseCar(UUID carId);
+    void releaseCar(UUID carId, CarRentalStatus status, String kafkaMessageKey, UUID senderId);
 }

@@ -1,32 +1,16 @@
 package dev.mvasylenko.carservice.service;
 
-import java.util.UUID;
-
 public interface IdempotencyService {
+    /**
+     * Trying to add event/command key to redis database
+     * @param key
+     * @return true - for new key; false - if key already exist
+     */
+    boolean tryAcquire(String key);
 
     /**
-     * Check whether event has already processed
-     * @param eventKey
-     * @return true if command has already processed, otherwith - false
+     * Marks event/command by key as done
+     * @param key
      */
-    boolean isEventProcessed(UUID eventKey);
-
-    /**
-     * Marking event as processed in redis
-     * @param eventKey
-     */
-    void markEventAsProcessed(UUID eventKey);
-
-    /**
-     * Check whether command has already processed
-     * @param commandKey
-     * @return true if command has already processed, otherwith - false
-     */
-    boolean isCommandProcessed(UUID commandKey);
-
-    /**
-     * Marking command as processed in redis
-     * @param commandKey
-     */
-    void markCommandAsProcessed(UUID commandKey);
+    void markAsDone(String key);
 }
