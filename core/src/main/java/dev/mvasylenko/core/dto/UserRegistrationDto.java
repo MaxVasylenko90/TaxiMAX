@@ -2,7 +2,6 @@ package dev.mvasylenko.core.dto;
 
 import dev.mvasylenko.core.enums.Role;
 import dev.mvasylenko.core.model.DriverInfo;
-import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;

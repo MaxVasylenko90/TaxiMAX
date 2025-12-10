@@ -34,18 +34,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthUserRepository userRepository;
     private final JwtService jwtService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final String registrationTopicName;
+    private final String registrationEventsTopicName;
     private final PasswordEncoder passwordEncoder;
 
     public AuthenticationServiceImpl(AuthenticationManager authenticationManager, AuthUserRepository userRepository,
                                      JwtService jwtService, KafkaTemplate<String, Object> kafkaTemplate,
-                                     @Value("registration.topic.name") String registrationTopicName,
+                                     @Value("${registration.events.topic.name}") String registrationEventsTopicName,
                                      PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.kafkaTemplate = kafkaTemplate;
-        this.registrationTopicName = registrationTopicName;
+        this.registrationEventsTopicName = registrationEventsTopicName;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -78,7 +78,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var registeredUser = userRepository.save(authUser);
 
         UserRegisteredEvent event = createUserRegisteredEvent(authUser.getId(), email, name, Role.PASSENGER);
-        kafkaTemplate.send(registrationTopicName, registeredUser.getId().toString(), event);
+        kafkaTemplate.send(registrationEventsTopicName, registeredUser.getId().toString(), event);
 
         LOG.info("AuthUser with email = {} has been registered successfully", email);
         return registeredUser;
@@ -90,8 +90,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         AuthUser authUser = new AuthUser(
                 userDto.getEmail(), passwordEncoder.encode(userDto.getPassword()), role);
         userRepository.save(authUser);
+        userRepository.flush();
 
-        kafkaTemplate.send(registrationTopicName, authUser.getId().toString(),
+        kafkaTemplate.send(registrationEventsTopicName, authUser.getId().toString(),
                 createUserRegisteredEvent(authUser.getId(), userDto, role));
 
         return AuthUserMapper.INSTANCE.authUserToAuthUserDto(authUser);

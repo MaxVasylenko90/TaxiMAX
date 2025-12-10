@@ -15,11 +15,11 @@ public class Passenger extends User {
         super();
     }
 
-    public Passenger(UUID id, String name, String surname, String email, String phone, BigDecimal amount) {
-        super(id, name, surname, email, phone, amount);
+    public Passenger(UUID id, String name, String surname, String email, String phone) {
+        super(id, name, surname, email, phone, BigDecimal.ZERO, Role.PASSENGER);
     }
 
     public Passenger(UUID id, String email, String name) {
-        super(id, email,name, Role.PASSENGER);
+        super(id, email, name, Role.PASSENGER);
     }
 }

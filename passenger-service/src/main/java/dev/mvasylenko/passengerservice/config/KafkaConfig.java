@@ -1,4 +1,4 @@
-package dev.mvasylenko.authservice.configuration;
+package dev.mvasylenko.passengerservice.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,4 +31,5 @@ public class KafkaConfig {
                 .replicas(TOPIC_REPLICATION_FACTOR)
                 .build();
     }
+
 }

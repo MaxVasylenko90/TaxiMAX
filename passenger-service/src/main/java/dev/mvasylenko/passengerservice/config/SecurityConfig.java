@@ -1,6 +1,5 @@
 package dev.mvasylenko.passengerservice.config;
 
-
 import dev.mvasylenko.passengerservice.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

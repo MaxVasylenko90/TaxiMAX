@@ -1,13 +1,10 @@
 package dev.mvasylenko.authservice.web.controller;
 
-import dev.mvasylenko.authservice.entity.AuthUser;
-import dev.mvasylenko.authservice.mapper.AuthUserMapper;
 import dev.mvasylenko.authservice.security.jwt.JwtService;
 import dev.mvasylenko.authservice.service.AuthenticationService;
 import dev.mvasylenko.core.dto.*;
 import dev.mvasylenko.core.enums.Role;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

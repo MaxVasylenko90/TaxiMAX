@@ -17,21 +17,20 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@KafkaListener(topics = {"${car.events.topic.name}"})
+@KafkaListener(topics = {"${registration.events.topic.name}"})
 public class PassengerServiceImpl implements PassengerService {
     private static final Logger LOG = LoggerFactory.getLogger(PassengerServiceImpl.class);
     private static final long TTL_HOURS = 24;
     private final PassengerRepository passengerRepository;
-    private final RedisTemplate<UUID, Object> eventsRedisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
 
-    public PassengerServiceImpl(PassengerRepository passengerRepository, RedisTemplate<UUID, Object> eventsRedisTemplate) {
+    public PassengerServiceImpl(PassengerRepository passengerRepository, RedisTemplate<String, Object> redisTemplate) {
         this.passengerRepository = passengerRepository;
-        this.eventsRedisTemplate = eventsRedisTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -45,8 +44,8 @@ public class PassengerServiceImpl implements PassengerService {
             acknowledgment.acknowledge();
             return;
         }
-        var eventId = event.getEventId();
-        if (eventsRedisTemplate.hasKey(eventId)) {
+        var eventId = event.getEventId().toString();
+        if (redisTemplate.hasKey(eventId)) {
             LOG.info("Event with id={} has already processed! Skipping...", eventId);
             acknowledgment.acknowledge();
             return;
@@ -59,10 +58,11 @@ public class PassengerServiceImpl implements PassengerService {
             passenger.setSurname(event.getSurname());
             passenger.setEmail(event.getEmail());
             passenger.setPhone(event.getPhone());
+            passenger.setRole(event.getRole());
 
             passengerRepository.save(passenger);
 
-            eventsRedisTemplate.opsForValue().set(eventId, true, TTL_HOURS, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(eventId, true, TTL_HOURS, TimeUnit.HOURS);
             acknowledgment.acknowledge();
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);

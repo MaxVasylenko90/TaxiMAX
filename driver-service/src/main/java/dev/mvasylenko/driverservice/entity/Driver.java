@@ -1,6 +1,7 @@
 package dev.mvasylenko.driverservice.entity;
 
 import dev.mvasylenko.core.enums.DriverStatus;
+import dev.mvasylenko.core.enums.Role;
 import dev.mvasylenko.core.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -32,7 +33,7 @@ public class Driver extends User {
 
     public Driver(UUID id, String name, String surname, String email, String phone,
                   BigDecimal amount, String driverLicenceNumber, UUID carId) {
-        super(id, name, surname, email, phone, amount);
+        super(id, name, surname, email, phone, amount, Role.DRIVER);
         this.driverLicenceNumber = driverLicenceNumber;
         this.carId = carId;
     }

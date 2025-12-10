@@ -67,13 +67,14 @@ public abstract class User {
     public User() {
     }
 
-    public User(UUID id, String name, String surname, String email, String phone, BigDecimal amount) {
+    public User(UUID id, String name, String surname, String email, String phone, BigDecimal amount, Role role) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.phone = phone;
         this.amount = amount;
+        this.role = role;
     }
 
     public User (UUID id, String email, String name, Role role) {

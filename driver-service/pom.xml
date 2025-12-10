@@ -135,18 +135,6 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>11.17.0</version>
-
-                <configuration>
-                    <url>jdbc:postgresql://localhost:5434/driverServiceDb</url>
-                    <user>admin</user>
-                    <password>nimda</password>
-                    <schemas>
-                        <schema>public</schema>
-                    </schemas>
-                    <locations>
-                        <location>filesystem:src/main/resources/db/migration</location>
-                    </locations>
-                </configuration>
             </plugin>
         </plugins>
     </build>
