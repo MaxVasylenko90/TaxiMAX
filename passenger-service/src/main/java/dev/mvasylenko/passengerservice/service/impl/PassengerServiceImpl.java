@@ -39,7 +39,6 @@ public class PassengerServiceImpl implements PassengerService {
     public void createPassenger(@Payload UserRegisteredEvent event,
                                 @Header(KafkaHeaders.RECEIVED_KEY) String kafkaMessageKey,
                                 Acknowledgment acknowledgment) {
-        //TODO refactoring + add idempotencyService to core module
         if (event.getRole() != Role.PASSENGER) {
             acknowledgment.acknowledge();
             return;

@@ -79,7 +79,7 @@ services:
       - kafka-net
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: ${auth.db.password}
+      POSTGRES_PASSWORD: ${auth_db_password}
       POSTGRES_DB: authServiceDb
     ports:
       - "5431:5432"
@@ -94,7 +94,7 @@ services:
       - kafka-net
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: ${car.db.password}
+      POSTGRES_PASSWORD: ${car_db_password}
       POSTGRES_DB: carServiceDb
     ports:
       - "5433:5432"
@@ -109,7 +109,7 @@ services:
       - kafka-net
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: ${driver.db.password}
+      POSTGRES_PASSWORD: ${driver_db_password}
       POSTGRES_DB: driverServiceDb
     ports:
       - "5434:5432"
@@ -124,7 +124,7 @@ services:
       - kafka-net
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: ${payment.db.password}
+      POSTGRES_PASSWORD: ${payment_db_password}
       POSTGRES_DB: paymentServiceDb
     ports:
       - "5435:5432"
@@ -139,7 +139,7 @@ services:
       - kafka-net
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: ${passenger.db.password}
+      POSTGRES_PASSWORD: ${passenger_db_password}
       POSTGRES_DB: passengerServiceDb
     ports:
       - "5436:5432"

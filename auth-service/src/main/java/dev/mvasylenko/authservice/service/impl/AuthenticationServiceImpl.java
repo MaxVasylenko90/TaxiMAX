@@ -76,6 +76,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         AuthUser authUser = new AuthUser(email, Role.PASSENGER);
         var registeredUser = userRepository.save(authUser);
+        userRepository.flush();
 
         UserRegisteredEvent event = createUserRegisteredEvent(authUser.getId(), email, name, Role.PASSENGER);
         kafkaTemplate.send(registrationEventsTopicName, registeredUser.getId().toString(), event);
@@ -92,9 +93,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(authUser);
         userRepository.flush();
 
-        kafkaTemplate.send(registrationEventsTopicName, authUser.getId().toString(),
-                createUserRegisteredEvent(authUser.getId(), userDto, role));
+        UserRegisteredEvent event = createUserRegisteredEvent(authUser.getId(), userDto, Role.PASSENGER);
+        kafkaTemplate.send(registrationEventsTopicName, authUser.getId().toString(), event);
 
+        LOG.info("AuthUser with email = {} has been registered successfully", authUser.getEmail());
         return AuthUserMapper.INSTANCE.authUserToAuthUserDto(authUser);
     }
 

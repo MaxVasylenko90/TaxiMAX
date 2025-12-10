@@ -22,7 +22,6 @@ public class AuthUser implements UserDetails {
     @Size(min = 2, max = 30)
     @Email
     @NotBlank
-
     private String email;
 
     @Column(name = "password")
