@@ -25,13 +25,6 @@ public interface AuthenticationService {
     ResponseEntity<Map<String, String>> refreshAccessToken(String refreshToken);
 
     /**
-     * Registration of a new OAuth user
-     * @param oauthUser
-     * @return AuthUser object
-     */
-    AuthUser registerNewOAuth2User(OAuth2User oauthUser);
-
-    /**
      * User registration
      * @param userDto
      * @param role

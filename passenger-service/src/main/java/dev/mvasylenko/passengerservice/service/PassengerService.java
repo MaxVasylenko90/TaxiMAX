@@ -1,9 +1,14 @@
 package dev.mvasylenko.passengerservice.service;
 
-import dev.mvasylenko.core.events.UserRegisteredEvent;
+import dev.mvasylenko.core.events.PassengerRegisteredEvent;
 import org.springframework.kafka.support.Acknowledgment;
 
 public interface PassengerService {
-    void createPassenger(UserRegisteredEvent event, String kafkaMessageKey, Acknowledgment acknowledgment);
-
+    /**
+     * Create passenger
+     * @param event
+     * @param kafkaMessageKey
+     * @param acknowledgment
+     */
+    void createPassenger(PassengerRegisteredEvent event, String kafkaMessageKey, Acknowledgment acknowledgment);
 }

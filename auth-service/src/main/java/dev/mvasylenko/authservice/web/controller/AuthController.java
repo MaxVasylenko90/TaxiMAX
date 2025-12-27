@@ -6,6 +6,7 @@ import dev.mvasylenko.core.dto.*;
 import dev.mvasylenko.core.enums.Role;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -17,10 +18,8 @@ import static dev.mvasylenko.core.constants.CoreConstants.REFRESH_TOKEN;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    private static final String GOOGLE_LOGIN = "googleLogin";
-    private static final String FACEBOOK_LOGIN = "facebookLogin";
-    private static final String OAUTH_2_AUTHORIZATION_GOOGLE_LINK = "http://localhost:8081/oauth2/authorization/google";
-    private static final String OAUTH_2_AUTHORIZATION_FACEBOOK_LINK = "http://localhost:8081/oauth2/authorization/facebook";
+//    private static final String GOOGLE_LOGIN = "googleLogin";
+//    private static final String OAUTH_2_AUTHORIZATION_GOOGLE_LINK = "http://localhost:10200/oauth2/authorization/google";
     private final AuthenticationService authenticationService;
     private final JwtService jwtService;
 
@@ -49,12 +48,11 @@ public class AuthController {
         return authenticationService.register(userDto, Role.PASSENGER);
     }
 
-    @GetMapping("/login")
-    public Map<String, String> login() {
-        return Map.of(MESSAGE, "This is login page",
-                GOOGLE_LOGIN, OAUTH_2_AUTHORIZATION_GOOGLE_LINK,
-                FACEBOOK_LOGIN, OAUTH_2_AUTHORIZATION_FACEBOOK_LINK);
-    }
+//    @GetMapping("/login")
+//    public Map<String, String> login() {
+//        return Map.of(MESSAGE, "This is login page",
+//                GOOGLE_LOGIN, OAUTH_2_AUTHORIZATION_GOOGLE_LINK);
+//    }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody @Valid UserLoginDto userLoginDto) {

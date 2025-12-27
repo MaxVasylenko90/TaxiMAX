@@ -1,0 +1,1 @@
+ALTER TABLE driver ADD COLUMN is_account_completed BOOLEAN NOT NULL

@@ -33,7 +33,6 @@ public abstract class User {
     private BigDecimal amount = BigDecimal.ZERO;;
 
     @Column(name = "phone")
-    @NotBlank(message = "Phone number is required")
     @Pattern(regexp = "^[0-9]{9}$", message = "Number should contain only 9 digits from 0 to 9")
     private String phone;
 
@@ -64,6 +63,9 @@ public abstract class User {
     @NotNull
     private Role role;
 
+    @Column(name = "is_account_completed")
+    private boolean isAccountCompleted;
+
     public User() {
     }
 
@@ -75,13 +77,8 @@ public abstract class User {
         this.phone = phone;
         this.amount = amount;
         this.role = role;
-    }
-
-    public User (UUID id, String email, String name, Role role) {
-        this.id = id;
-        this.email = email;
-        this.name = name;
-        this.role = role;
+        isAccountCompleted = List.of(id, name, surname, email, phone, amount, role).stream()
+                .allMatch(Objects::nonNull);
     }
 
     public String getName() {
@@ -162,5 +159,13 @@ public abstract class User {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public boolean isAccountCompleted() {
+        return isAccountCompleted;
+    }
+
+    public void setAccountCompleted(boolean accountCompleted) {
+        isAccountCompleted = accountCompleted;
     }
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.mvasylenko.authservice.entity.AuthUser;
 import dev.mvasylenko.authservice.repository.AuthUserRepository;
 import dev.mvasylenko.authservice.security.jwt.JwtService;
-import dev.mvasylenko.authservice.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -24,12 +23,10 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final AuthUserRepository authUserRepository;
     private final JwtService jwtService;
-    private final AuthenticationService authenticationService;
 
-    public OAuth2AuthenticationSuccessHandler(AuthUserRepository authUserRepository, JwtService jwtService, AuthenticationService authenticationService) {
+    public OAuth2AuthenticationSuccessHandler(AuthUserRepository authUserRepository, JwtService jwtService) {
         this.authUserRepository = authUserRepository;
         this.jwtService = jwtService;
-        this.authenticationService = authenticationService;
     }
 
     @Override
@@ -38,8 +35,9 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                                         Authentication authentication) throws IOException {
         final OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
         String email = oauthUser.getAttribute(EMAIL);
-        AuthUser user = authUserRepository.findByEmail(email).orElseGet(() ->
-                authenticationService.registerNewOAuth2User(oauthUser));
+        AuthUser user = authUserRepository.findByEmail(email).orElseThrow(() ->
+                new IllegalStateException("OAuth user must exist!")
+        );
 
         Map<String, Object> claims = Map.of(
                 ID, user.getId().toString(),

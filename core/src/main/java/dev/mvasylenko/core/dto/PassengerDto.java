@@ -1,5 +1,6 @@
 package dev.mvasylenko.core.dto;
 
+import dev.mvasylenko.core.enums.Role;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -18,10 +19,6 @@ public class PassengerDto {
     @NotNull(message = "Surname is required!")
     @Size(min = 2, max = 50)
     private String surname;
-
-    @NotNull(message = "Password is required!")
-    @Size(min = 2, max = 50)
-    private String password;
 
     @NotBlank(message = "Email is required!")
     @Email
@@ -44,16 +41,19 @@ public class PassengerDto {
 
     private Set<UUID> rideHistory;
 
+    private Role role;
+
+    private boolean isAccountCompleted;
+
     public PassengerDto() {
         super();
     }
 
-    public PassengerDto(UUID id, String name, String surname, String password, String email, BigDecimal amount,
+    public PassengerDto(UUID id, String name, String surname, String email, BigDecimal amount,
                         String phone, BigDecimal averageRating, List<String> comments, Set<UUID> rideHistory) {
         this.id = id;
         this.name = name;
         this.surname = surname;
-        this.password = password;
         this.email = email;
         this.amount = amount;
         this.phone = phone;
@@ -84,14 +84,6 @@ public class PassengerDto {
 
     public void setSurname(String surname) {
         this.surname = surname;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {
@@ -140,5 +132,21 @@ public class PassengerDto {
 
     public void setRideHistory(Set<UUID> rideHistory) {
         this.rideHistory = rideHistory;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public boolean isAccountCompleted() {
+        return isAccountCompleted;
+    }
+
+    public void setAccountCompleted(boolean accountCompleted) {
+        isAccountCompleted = accountCompleted;
     }
 }
