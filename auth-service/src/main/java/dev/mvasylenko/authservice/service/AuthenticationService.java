@@ -26,9 +26,15 @@ public interface AuthenticationService {
 
     /**
      * User registration
-     * @param userDto
-     * @param role
+     * @param passenger
      * @return AuthUserDto object
      */
-    AuthUserDto register(@Valid UserRegistrationDto userDto, Role role);
+    AuthUserDto register(@Valid PassengerRegistrationDto passenger);
+
+    /**
+     * User registration
+     * @param driver
+     * @return AuthUserDto object
+     */
+    AuthUserDto register(@Valid DriverRegistrationDto driver);
 }

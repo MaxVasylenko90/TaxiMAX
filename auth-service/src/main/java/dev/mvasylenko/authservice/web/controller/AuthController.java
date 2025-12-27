@@ -34,8 +34,8 @@ public class AuthController {
     }
 
     @PostMapping("/driver/registration")
-    public AuthUserDto driverRegistration(@RequestBody @Valid UserRegistrationDto userDto) {
-        return authenticationService.register(userDto, Role.DRIVER);
+    public AuthUserDto driverRegistration(@RequestBody @Valid DriverRegistrationDto driver) {
+        return authenticationService.register(driver);
     }
 
     @GetMapping("/passenger/registration")
@@ -44,8 +44,8 @@ public class AuthController {
     }
 
     @PostMapping("/passenger/registration")
-    public AuthUserDto passengerRegistration(@RequestBody @Valid UserRegistrationDto userDto) {
-        return authenticationService.register(userDto, Role.PASSENGER);
+    public AuthUserDto passengerRegistration(@RequestBody @Valid PassengerRegistrationDto passenger) {
+        return authenticationService.register(passenger);
     }
 
 //    @GetMapping("/login")

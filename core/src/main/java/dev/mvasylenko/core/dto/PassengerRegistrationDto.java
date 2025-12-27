@@ -1,14 +1,13 @@
 package dev.mvasylenko.core.dto;
 
 import dev.mvasylenko.core.enums.Role;
-import dev.mvasylenko.core.model.DriverInfo;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
 
 import java.util.UUID;
 
-public class UserRegistrationDto {
+public class PassengerRegistrationDto {
     private UUID id = UUID.randomUUID();
 
     @NotBlank(message = "Name is required!")
@@ -35,40 +34,25 @@ public class UserRegistrationDto {
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.PASSENGER;
 
-    private DriverInfo driverInfo;
-
-    public UserRegistrationDto() {
+    public PassengerRegistrationDto() {
     }
 
-    public UserRegistrationDto(String name, String surname, String password, String email,
-                               String phone, DriverInfo driverInfo) {
+    public PassengerRegistrationDto(String name, String surname, String password, String email, String phone) {
         this.name = name;
         this.surname = surname;
         this.password = password;
         this.email = email;
         this.phone = phone;
-        this.driverInfo = driverInfo;
     }
 
-    public UserRegistrationDto(String name, String surname, String password, String email, String phone) {
-        this.name = name;
-        this.surname = surname;
-        this.password = password;
-        this.email = email;
-        this.phone = phone;
-        this.driverInfo = null;
-    }
-
-    public UserRegistrationDto(String email, String name) {
+    public PassengerRegistrationDto(String email, String name) {
         this.email = email;
         this.name = name;
-        this.role = Role.PASSENGER;
         this.surname = null;
         this.password = null;
         this.phone = null;
-        this.driverInfo = null;
     }
 
     public UUID getId() {
@@ -119,23 +103,11 @@ public class UserRegistrationDto {
         this.phone = phone;
     }
 
-    public DriverInfo getDriverInfo() {
-        return driverInfo;
-    }
-
-    public void setDriver(DriverInfo driverInfo) {
-        this.driverInfo = driverInfo;
-    }
-
     public Role getRole() {
         return role;
     }
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public void setDriverInfo(DriverInfo driverInfo) {
-        this.driverInfo = driverInfo;
     }
 }

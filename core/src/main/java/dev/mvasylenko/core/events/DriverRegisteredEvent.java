@@ -1,11 +1,11 @@
 package dev.mvasylenko.core.events;
 
+import dev.mvasylenko.core.dto.CarDto;
 import dev.mvasylenko.core.enums.Role;
-import dev.mvasylenko.core.model.DriverInfo;
 
 import java.util.UUID;
 
-public class DriverRegisteredEvent implements UserRegisteredEvent{
+public class DriverRegisteredEvent {
     private UUID eventId = UUID.randomUUID();
     private UUID userId;
     private String name;
@@ -13,25 +13,21 @@ public class DriverRegisteredEvent implements UserRegisteredEvent{
     private String email;
     private String phone;
     private Role role;
-    private DriverInfo driverInfo;
+    private String drivingLicense;
+    private CarDto car;
 
     public DriverRegisteredEvent() {
     }
 
-    public DriverRegisteredEvent(UUID userId, String name, String surname, String email, String phone, Role role, DriverInfo driverInfo) {
+    public DriverRegisteredEvent(UUID userId, String name, String surname, String email, String phone, Role role, String  drivingLicense, CarDto car) {
         this.userId = userId;
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.phone = phone;
         this.role = role;
-        this.driverInfo = driverInfo;
-    }
-
-    public DriverRegisteredEvent(String email, String name, Role role) {
-        this.email = email;
-        this.name = name;
-        this.role = role;
+        this.drivingLicense = drivingLicense;
+        this.car = car;
     }
 
     public UUID getEventId() {
@@ -82,19 +78,27 @@ public class DriverRegisteredEvent implements UserRegisteredEvent{
         this.role = role;
     }
 
-    public DriverInfo getDriverInfo() {
-        return driverInfo;
-    }
-
-    public void setDriverInfo(DriverInfo driverInfo) {
-        this.driverInfo = driverInfo;
-    }
-
     public UUID getUserId() {
         return userId;
     }
 
     public void setUserId(UUID userId) {
         this.userId = userId;
+    }
+
+    public String getDrivingLicense() {
+        return drivingLicense;
+    }
+
+    public void setDrivingLicense(String drivingLicense) {
+        this.drivingLicense = drivingLicense;
+    }
+
+    public CarDto getCar() {
+        return car;
+    }
+
+    public void setCar(CarDto car) {
+        this.car = car;
     }
 }

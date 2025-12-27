@@ -1,11 +1,10 @@
 package dev.mvasylenko.core.events;
 
 import dev.mvasylenko.core.enums.Role;
-import dev.mvasylenko.core.model.DriverInfo;
 
 import java.util.UUID;
 
-public class PassengerRegisteredEvent implements UserRegisteredEvent{
+public class PassengerRegisteredEvent {
     private UUID eventId = UUID.randomUUID();
     private UUID userId;
     private String name;
@@ -13,19 +12,17 @@ public class PassengerRegisteredEvent implements UserRegisteredEvent{
     private String email;
     private String phone;
     private Role role;
-    private DriverInfo driverInfo;
 
     public PassengerRegisteredEvent() {
     }
 
-    public PassengerRegisteredEvent(UUID userId, String name, String surname, String email, String phone, Role role, DriverInfo driverInfo) {
+    public PassengerRegisteredEvent(UUID userId, String name, String surname, String email, String phone, Role role) {
         this.userId = userId;
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.phone = phone;
         this.role = role;
-        this.driverInfo = driverInfo;
     }
 
     public PassengerRegisteredEvent(String email, String name, Role role) {
@@ -82,13 +79,13 @@ public class PassengerRegisteredEvent implements UserRegisteredEvent{
         this.role = role;
     }
 
-    public DriverInfo getDriverInfo() {
-        return driverInfo;
-    }
-
-    public void setDriverInfo(DriverInfo driverInfo) {
-        this.driverInfo = driverInfo;
-    }
+//    public DriverInfo getDriverInfo() {
+//        return driverInfo;
+//    }
+//
+//    public void setDriverInfo(DriverInfo driverInfo) {
+//        this.driverInfo = driverInfo;
+//    }
 
     public UUID getUserId() {
         return userId;

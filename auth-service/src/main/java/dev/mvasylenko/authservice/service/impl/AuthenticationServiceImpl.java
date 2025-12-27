@@ -9,7 +9,6 @@ import dev.mvasylenko.core.dto.*;
 import dev.mvasylenko.core.enums.Role;
 import dev.mvasylenko.core.events.DriverRegisteredEvent;
 import dev.mvasylenko.core.events.PassengerRegisteredEvent;
-import dev.mvasylenko.core.events.UserRegisteredEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,18 +31,18 @@ import static dev.mvasylenko.core.constants.CoreConstants.*;
 public class AuthenticationServiceImpl implements AuthenticationService {
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
     private final AuthenticationManager authenticationManager;
-    private final AuthUserRepository userRepository;
+    private final AuthUserRepository authUserRepository;
     private final JwtService jwtService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String registrationEventsTopicName;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthenticationServiceImpl(AuthenticationManager authenticationManager, AuthUserRepository userRepository,
+    public AuthenticationServiceImpl(AuthenticationManager authenticationManager, AuthUserRepository authUserRepository,
                                      JwtService jwtService, KafkaTemplate<String, Object> kafkaTemplate,
                                      @Value("${registration.events.topic.name}") String registrationEventsTopicName,
                                      PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
+        this.authUserRepository = authUserRepository;
         this.jwtService = jwtService;
         this.kafkaTemplate = kafkaTemplate;
         this.registrationEventsTopicName = registrationEventsTopicName;
@@ -71,29 +70,36 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     @Transactional
-    public AuthUserDto register(UserRegistrationDto userDto, Role role) {
+    public AuthUserDto register(PassengerRegistrationDto passenger) {
         AuthUser authUser = new AuthUser(
-                userDto.getEmail(), passwordEncoder.encode(userDto.getPassword()), role);
-        userRepository.save(authUser);
-        userRepository.flush();
+                passenger.getEmail(), passwordEncoder.encode(passenger.getPassword()), Role.PASSENGER);
+        authUserRepository.save(authUser);
+        authUserRepository.flush();
 
-        if (role == Role.PASSENGER) {
-            PassengerRegisteredEvent event = createPassengerRegisteredEvent(authUser.getId(), userDto, Role.PASSENGER);
-            kafkaTemplate.send(registrationEventsTopicName, authUser.getId().toString(), event);
-        }
+        PassengerRegisteredEvent event = createPassengerRegisteredEvent(authUser.getId(), passenger);
+        kafkaTemplate.send(registrationEventsTopicName, authUser.getId().toString(), event);
 
-        if (role == Role.DRIVER) {
-            DriverRegisteredEvent event = createDriverRegisteredEvent(authUser.getId(), userDto, Role.DRIVER);
-            kafkaTemplate.send(registrationEventsTopicName, authUser.getId().toString(), event);
-        }
+        LOG.info("AuthUser with email = {} has been registered successfully", authUser.getEmail());
+        return AuthUserMapper.INSTANCE.authUserToAuthUserDto(authUser);
+    }
 
+    @Override
+    @Transactional
+    public AuthUserDto register(DriverRegistrationDto driver) {
+        AuthUser authUser = new AuthUser(
+                driver.getEmail(), passwordEncoder.encode(driver.getPassword()), Role.DRIVER);
+        authUserRepository.save(authUser);
+        authUserRepository.flush();
+
+        DriverRegisteredEvent event = createDriverRegisteredEvent(authUser.getId(), driver);
+        kafkaTemplate.send(registrationEventsTopicName, authUser.getId().toString(), event);
 
         LOG.info("AuthUser with email = {} has been registered successfully", authUser.getEmail());
         return AuthUserMapper.INSTANCE.authUserToAuthUserDto(authUser);
     }
 
     private ResponseEntity<Map<String, String>> generateNewTokens(String email) {
-        var user = userRepository.findByEmail(email)
+        var user = authUserRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User with current email wasn't found!"));
 
         Map<String, Object> claims = Map.of(
@@ -106,25 +112,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         REFRESH_TOKEN, jwtService.generateRefreshToken(user, claims)));
     }
 
-    private PassengerRegisteredEvent createPassengerRegisteredEvent(UUID userId, UserRegistrationDto userDto, Role role) {
+    private PassengerRegisteredEvent createPassengerRegisteredEvent(UUID userId, PassengerRegistrationDto passengerDto) {
         PassengerRegisteredEvent event = new PassengerRegisteredEvent();
-        enrichEvent(event, userId, userDto, role);
-        return event;
-    }
-
-    private DriverRegisteredEvent createDriverRegisteredEvent(UUID userId, UserRegistrationDto userDto, Role role) {
-        DriverRegisteredEvent event = new DriverRegisteredEvent();
-        enrichEvent(event, userId, userDto, role);
-        return event;
-    }
-
-    private <T extends UserRegisteredEvent> void enrichEvent (T event, UUID userId, UserRegistrationDto userDto, Role role) {
         event.setUserId(userId);
-        event.setName(userDto.getName());
-        event.setSurname(userDto.getSurname());
-        event.setEmail(userDto.getEmail());
-        event.setPhone(userDto.getPhone());
-        event.setRole(role);
-        event.setDriverInfo(userDto.getDriverInfo());
+        event.setName(passengerDto.getName());
+        event.setSurname(passengerDto.getSurname());
+        event.setEmail(passengerDto.getEmail());
+        event.setPhone(passengerDto.getPhone());
+        event.setRole(passengerDto.getRole());
+        return event;
+    }
+
+    private DriverRegisteredEvent createDriverRegisteredEvent(UUID userId, DriverRegistrationDto driverDto) {
+        DriverRegisteredEvent event = new DriverRegisteredEvent();
+        event.setUserId(userId);
+        event.setName(driverDto.getName());
+        event.setSurname(driverDto.getSurname());
+        event.setEmail(driverDto.getEmail());
+        event.setPhone(driverDto.getPhone());
+        event.setRole(driverDto.getRole());
+        event.setDrivingLicense(driverDto.getDriverLicenceNumber());
+        event.setCar(driverDto.getCar());
+        return event;
     }
 }
